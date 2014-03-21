@@ -140,6 +140,11 @@ class NetworkXGraph(ConceptGraph):
     def addEdge (self, parentConcept, childConcept):
         return self.G.add_edge(parentConcept.name, childConcept.name)
 
+    def saveGraphPajek(self, filename=None):
+        if filename == None:
+            filename = "concept.net"
+        nx.write_pajek(self.G,filename)
+        
     def drawGraph(self, filename=None):
         if filename == None:
             filename = imageFile
