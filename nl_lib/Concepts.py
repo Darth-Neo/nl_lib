@@ -4,6 +4,8 @@ import pickle
 
 from nl_lib import Logger
 logger = Logger.setupLogging(__name__)
+
+
  
 #
 # Concept Class which support recursive concepts via a dictionary
@@ -18,23 +20,13 @@ class Concepts(object):
 
     delchars = ''.join(c for c in map(chr, range(255)) if (not c.isalnum() and c != ' '))
 
-    def __init__(self, name=None, typeName=None, homeDir=None, load=False):
+    def __init__(self, name=None, typeName=None):
         logger.debug("Init Concept - %s:%s" % (name, typeName))
         
         self.name = self.cleanString(name)
         self.typeName = self.cleanString(typeName)
         self.cd = dict()
         self.count = 1
-
-        if homeDir == None:
-            homeDir = os.curdir
-        
-        self.conceptFile = homeDir + os.sep + typeName + ".p"
-        
-        if load :
-            self.loadConcepts()
-        else:
-            logger.debug("Skipped loading - %s" % self.conceptFile)
 
     def __getitem__(self, id):
         try:
