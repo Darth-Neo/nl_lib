@@ -188,6 +188,8 @@ class TopicsModel(object):
                 sl.append(projectList[j])
                 sl.append(projectList[i])
                 sl.append(str(simsList[i]))
+                sl.append(documentsList[j])
+                sl.append(documentsList[i])
                 projectSimilarity.append(sl)
 
         logger.debug("Project Similarity List %s" % (projectSimilarity))

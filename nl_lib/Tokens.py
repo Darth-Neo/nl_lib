@@ -11,6 +11,7 @@ from pattern.en import parse
 from pattern.en import tag
 from pattern.en import parsetree
 from pattern.en import wordnet
+from pattern.en import Sentence
 
 from nl_lib import Logger, Concepts
 logger = Logger.setupLogging(__name__)
@@ -72,8 +73,9 @@ def sentenceTokensNLTK (sentence, projectsConcepts, wordsConcepts):
                 #    logger.debug("Synonym: " + l.name)
                 #    wl = wordConcepts.addConcept(l.name, "Synonym")
 
-def addChunks(sentence, projectsConcepts, wordsConcepts):
-    for chunk in sentence.chunks:
+def sentenceTokensPatternChunks(sentence, projectsConcepts, wordsConcepts):
+    sent = Sentence(parse(sentence))
+    for chunk in sent.chunks:
         wordChunk = chunk.string
 
         if chunk.type == "NP":

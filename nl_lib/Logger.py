@@ -17,12 +17,16 @@ def setupLogging(name):
     consoleHandler.setFormatter(logFormatter)
     logger.addHandler(consoleHandler)
 
-    fileHandler = logging.handlers.RotatingFileHandler(logFile, maxBytes=10485760, backupCount=5)
-    fileHandler.setFormatter(logFormatter)
-    logger.addHandler(fileHandler)
+    #fileHandler = logging.handlers.RotatingFileHandler(logFile, maxBytes=10485760, backupCount=5)
+    #fileHandler.setFormatter(logFormatter)
+    #logger.addHandler(fileHandler)
+
+    hdlr = logging.FileHandler(logFile)
+    hdlr.setFormatter(logFormatter)
+    logger.addHandler(hdlr) 
 
     # Reset Logfile
-    with open(logFile, 'w'):
-        pass
+    #with open(logFile, 'w'):
+    #    pass
     
     return logger
