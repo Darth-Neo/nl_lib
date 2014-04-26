@@ -1,16 +1,17 @@
 import sys
 import os
 
-from nl_lib import Logger
-logger = Logger.setupLogging(__name__)
-
 from pattern.web    import Bing, Google, Wikipedia, plaintext, encode_utf8, URL, extension, download
 from pattern.en     import parsetree
 from pattern.search import search
-from pattern.graph  import Graph
 
-from Concepts import Concepts
-from TopicCloud import TopicCloud
+from nl_lib import Logger
+logger = Logger.setupLogging(__name__)
+
+from nl_lib.Constants import *
+from nl_lib.Concepts import Concepts
+from nl_lib.TopicCloud import TopicCloud
+from nl_lib.ConceptGraph import PatternGraph, NetworkXGraph
     
 AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0"
 
@@ -27,7 +28,7 @@ class PatternSearch(object):
     urlConcepts = None
     wordConcepts = None
         
-    def __init__(self, searchTerm, load=True, homeDir=None):
+    def __init__(self, searchTerm, homeDir=None):
         self.searchTerm = searchTerm       
 
         if homeDir == None:
@@ -40,10 +41,10 @@ class PatternSearch(object):
             
         self.htmlFile = self.homeDir + os.sep + "links.html"
         
-        self.urlConcepts = Concepts(self.searchTerm, "URLs", homeDir, load=load)
-        self.wordConcepts = Concepts(self.searchTerm, "Words", homeDir, load=load)
+        self.urlConcepts = Concepts(self.searchTerm, "URLs")
+        self.wordConcepts = Concepts(self.searchTerm, "Words")
     
-        self.g = Graph()
+        self.g = PatternGraph()
         
     def htmlSearch(self, html, url):
         logger.debug("htmlSearch URL : %s" % url)
@@ -65,7 +66,7 @@ class PatternSearch(object):
         logger.debug("  q.Length=%d" % len(q))
         logger.debug("  q[]=%s" % q)
         
-        self.g, self.urlConcepts, self.wordConcepts = self.urlConcepts.addNodes(self.g, q, url, self.urlConcepts, self.wordConcepts)
+        self.g, self.urlConcepts, self.wordConcepts = self.addNodes(self.g, q, url, self.urlConcepts, self.wordConcepts)
 
         return self.urlConcepts, self.wordConcepts
 
@@ -110,39 +111,19 @@ class PatternSearch(object):
                 logger.debug("  q.Length=%d" % len(q))
                 logger.debug("  q[]=%s" % q)
     
-                self.g, self.urlConcepts, self.wordConcepts = self.urlConcepts.addNodes(self.g, q, url, self.urlConcepts, self.wordConcepts)         
+                self.g, self.urlConcepts, self.wordConcepts = self.addNodes(self.g, q, url, self.urlConcepts, self.wordConcepts)         
 
         
         return self.urlConcepts, self.wordConcepts
     
     def savePatternConcepts(self):
         logger.debug("Save Concepts")
-        self.urlConcepts.saveConcepts()
-        self.wordConcepts.saveConcepts()
+	
+	Concepts.saveConcepts(self.urlConcepts, "URLs.p")
+	Concepts.saveConcepts(self.wordConcepts, "Words.p")
         
     def exportGraph(self):
-        logger.debug("exportGraph")
-        
-        logger.info("Graph Size: %d" % self.g.__len__())
-        
-        k = self.subGraph()
-        
-        try:
-            # Iterate through a list of unconnected subgraphs
-            if len(k) > 5:
-                klimit = 5
-            else:
-                klimit = len(k)
-                
-            for i in range(0, klimit):
-                logger.info("Graph[%d]=%d" % (i, len(k[i])))
-                newDir = self.homeDir + str(i)
-                h = k[i] 
-                h.export(newDir, overwrite=True, directed=True, weighted=0.5, title=self.searchTerm)
-                i += 1
-            
-        except:
-            logger.error(str(sys.exc_info()[0]))
+        self.g.exportGraph()
         
         logger.debug("Save HTML")
         # save URL-Words
@@ -242,3 +223,31 @@ class PatternSearch(object):
     def _logPOS(self, q):
         for word in q[0].words:
             logger.info(word.string + word.tag)
+            
+    def addNodes(self, g, q, url, urlConcepts, wordConcepts):
+        nodeURL = dict()
+        logger.debug("---url %s" % url)
+        for w in q:
+            logger.debug("  w.Length=%d" % len(w))
+            logger.debug("  w=%s" % w)
+            i = 1
+            for c in w:
+                urls = urlConcepts.addConceptKeyType(url, "URL")
+                cc = urls.addConceptKeyType(Concepts.encode_utf8(c.string), "Word")
+                
+                chunk = wordConcepts.addConceptKeyType(Concepts.encode_utf8(c.string), "Word")
+                chunk.addConceptKeyType(Concepts.encode_utf8(c.chunk), "Chunk")
+    
+                logger.debug("  " + Concepts.encode_utf8(c.string))
+    
+                if i == 1:
+                    i = 2
+                    logger.debug("--" + Concepts.encode_utf8(c.string))
+                    pp = cc
+                    g.addNode(cc)
+                else:
+                    logger.debug("--" + Concepts.encode_utf8(c.string))
+                    g.addNode(cc)
+                    g.addEdge(pp, cc)
+                        
+        return g, urlConcepts, wordConcepts

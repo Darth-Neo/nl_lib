@@ -202,19 +202,45 @@ class TopicsModel(object):
 
         wordcount = 0
 
-        # Iterate through the Projects
-        logger.info("Projects:" + concepts.name)
+        # Iterate through the Concepts
+        logger.info("Concept Name:" + concepts.name)
 
         pc = concepts.getConcepts()
-        for p in pc:
-            logger.debug("Project: %s" % pc[p].name)
+        for p in pc.values():
+            logger.debug("Concept: %s" % p.name)
 
             # Iterate through the Words
-            wc = pc[p].getConcepts()
+            wc = p.getConcepts()
             for w in wc.values():
                 logger.debug("Word: %s" % w.name)
                 texts.append(w.name)
                 wordcount += 1
+
+            documents.append(texts)
+            texts = list()
+
+        return documents, wordcount
+    
+    def loadConceptsWords(self, concepts):
+        documents = list()
+        texts = list()
+
+        wordcount = 0
+
+        # Iterate through the Concepts
+        logger.debug("Concept Name:" + concepts.name)
+
+        for document in concepts.getConcepts().values():
+            logger.debug("Concept: %s" % document.name)
+
+        for sentence in document.getConcepts().values():
+            logger.debug("Concept: %s" % sentence.name)
+
+            for word in sentence.name.split():
+                if len(word) > 1:
+                    logger.debug("Word: %s" % word)
+                    texts.append(word)
+                    wordcount += 1
 
             documents.append(texts)
             texts = list()

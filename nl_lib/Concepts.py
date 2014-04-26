@@ -5,8 +5,6 @@ import pickle
 from nl_lib import Logger
 logger = Logger.setupLogging(__name__)
 
-
- 
 #
 # Concept Class which support recursive concepts via a dictionary
 #
@@ -17,7 +15,7 @@ class Concepts(object):
     urn = None
     cd = None
     conceptFile = None
-
+    
     delchars = ''.join(c for c in map(chr, range(255)) if (not c.isalnum() and c != ' '))
 
     def __init__(self, name=None, typeName=None):
@@ -72,14 +70,22 @@ class Concepts(object):
         return conceptFilter
 
     def sdp(self, x, y):
-        return int((float(x * y) / float(x + y)) * 100.00)
+        try:
+            z = int((float(x * y) / float(x + y)) * 100.00)
+        except:
+            z = 0
+        logger.debug("z - %3.2f" % z)
+        return z
 
     def sortConcepts(self, typeName):
-        logger.debug("sortConcepts - %s" % typeName)
+        logger.info("sortConcepts - %s" % typeName)
+
         typeNameDict = self.dictChildrenType(typeName)
+        logger.info("typeNameDict : %s" % typeNameDict)
 
         nl = list()
         for n in typeNameDict:
+            logger.info("n - %s" % n)
             cl = list()
             cl.append(typeNameDict[n].name) #0
             wl = list();
@@ -159,3 +165,37 @@ class Concepts(object):
             logger.error(str(sys.exc_info()[0]))
             
         return conceptDict
+
+    @staticmethod
+    def decode_utf8(v, encoding="utf-8"):
+        """ Returns the given value as a Unicode string (if possible).
+        """
+        try:
+            if isinstance(encoding, basestring):
+                encoding = ((encoding,"ignore"),) + (("windows-1252",), ("utf-8", "ignore"))
+            if isinstance(v, str):
+                for e in encoding:
+                    try: return v.decode(*e)
+                    except:
+                        logger.error(str(sys.exc_info()[0]))
+                return v
+            return unicode(v)
+        except:
+            return " "
+        
+    @staticmethod
+    def encode_utf8(v, encoding="utf-8"):
+        """ Returns the given value as a Python byte string (if possible).
+        """
+        try:
+            if isinstance(encoding, basestring):
+                encoding = ((encoding, "ignore"),) + (("windows-1252",), ("utf-8", "ignore"))
+            if isinstance(v, unicode):
+                for e in encoding:
+                    try: return v.encode(*e)
+                    except:
+                        logger.error(str(sys.exc_info()[0]))
+                return v
+            return str(v)
+        except:
+            return " "
