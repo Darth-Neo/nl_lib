@@ -109,10 +109,10 @@ class TopicsModel(object):
         # training set
         self.corpus = [self.dictionary.doc2bow(text) for text in texts]
 
-        logger.info("corpus ready")
-        # for c1 in corpus:
+        #logger.info("corpus ready")
+        #for c1 in self.corpus:
         #    for c2 in c1:
-        #       logger.debug("word: " + dictionary[c2[0]] + "  count:" + c2[1] + "index: " + c2[0])
+        #       logger.info("word: %s  count:%s  index:%s" % (self.dictionary[c2[0]], c2[1], c2[0]))
 
         tfidf = models.TfidfModel(self.corpus)
         logger.info("tfidf: " + str(tfidf))
@@ -203,7 +203,7 @@ class TopicsModel(object):
         wordcount = 0
 
         # Iterate through the Concepts
-        logger.info("Concept Name:" + concepts.name)
+        logger.debug("Concept Name:" + concepts.name)
 
         pc = concepts.getConcepts()
         for p in pc.values():
@@ -233,16 +233,16 @@ class TopicsModel(object):
         for document in concepts.getConcepts().values():
             logger.debug("Concept: %s" % document.name)
 
-        for sentence in document.getConcepts().values():
-            logger.debug("Concept: %s" % sentence.name)
+            for sentence in document.getConcepts().values():
+                logger.debug("Concept: %s" % sentence.name)
 
-            for word in sentence.name.split():
-                if len(word) > 1:
-                    logger.debug("Word: %s" % word)
-                    texts.append(word)
-                    wordcount += 1
+                for word in sentence.name.split():
+                    if len(word) > 1:
+                        logger.debug("Word: %s" % word)
+                        texts.append(word)
+                        wordcount += 1
 
-            documents.append(texts)
-            texts = list()
+                documents.append(texts)
+                texts = list()
 
         return documents, wordcount

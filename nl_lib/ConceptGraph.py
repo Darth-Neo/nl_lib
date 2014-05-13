@@ -10,6 +10,8 @@ from nl_lib import Concepts
 
 logger = Logger.setupLogging(__name__)
 
+delchars = ''.join(c for c in map(chr, range(256)) if not c.isalnum())
+
 #
 # Base Class - ConceptGraph to export Concepts into Graph
 #
@@ -38,11 +40,11 @@ class ConceptGraph(object):
         n = n + 1
 
         if self.nodeDict.has_key(concept.name):
-            logger.info("Found Node: " + concept.name)
+            logger.debug("Found Node: " + concept.name)
             c = self.nodeDict[concept.name]
         else:
             c = self.addNode(concept)
-            logger.info("Add Node: " + concept.name + ": " + str(c))
+            logger.debug("Add Node: " + concept.name + ": " + str(c))
             self.nodeDict[concept.name] = c
             concept.urn = c
             self.labelDict[concept.typeName] = concept.typeName
@@ -56,19 +58,20 @@ class ConceptGraph(object):
         for p in pc:
             if self.isFiltered(filterDict, pc[p]):
                 self.addConcepts(pc[p], filterDict, depth, n)
-                logger.info("Add Rel: " + concept.name + " - " + concept.typeName + " - " + pc[p].name)
+                logger.debug("Add Edge: " + concept.name + " - " + concept.typeName + " - " + pc[p].name)
                 logger.debug("   Node: " + str(self.nodeDict[concept.name]))
                 logger.debug("   Node: " + str(self.nodeDict[pc[p].name]))
                 self.addEdge(concept, pc[p])
         return c
 
     def addConcept(self, concept):
+        concept.name = concept.name.translate(None, delchars)
         if self.nodeDict.has_key(concept.name):
-            logger.info("Found Node: " + concept.name)
+            logger.debug("Found Node: " + concept.name)
             c = self.nodeDict[concept.name]
         else:
             c = self.addNode(concept)
-            logger.info("Add Node: " + concept.name + ": " + str(c))
+            logger.debug("Add Node: " + concept.name + ": " + str(c))
             self.nodeDict[concept.name] = c
             concept.urn = c
             self.labelDict[concept.typeName] = concept.typeName

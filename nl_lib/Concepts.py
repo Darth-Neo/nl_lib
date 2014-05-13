@@ -106,7 +106,7 @@ class Concepts(object):
         spaces = " " * n
 
         for p in pc.values():
-            logger.info("%s%s[%s]->Count=%s" % (spaces, p.name, p.typeName, p.count))
+            logger.info("%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
             p.logConcepts(n+1)
 
     def printConcepts(self, n=0):
