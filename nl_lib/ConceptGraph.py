@@ -1,12 +1,17 @@
 import os
+import sys
 import networkx as nx
 import matplotlib.pyplot as plt
 from py2neo import neo4j, node, rel
 from pattern.graph  import Graph
 
 from nl_lib import Logger
-from nl_lib import Constants
-from nl_lib import Concepts
+logger = Logger.setupLogging(__name__)
+
+from nl_lib.Constants import *
+from nl_lib.Concepts import Concepts
+
+from traceback import format_exc
 
 logger = Logger.setupLogging(__name__)
 
@@ -29,7 +34,7 @@ class ConceptGraph(object):
         if filterDict.has_key(concept.typeName):
             logger.debug("Checking Type - " + concept.typeName)
             if concept.name in filterDict[concept.typeName]:
-                logger.info("Keep Node - " + concept.name)
+                logger.debug("Keep Node - " + concept.name)
                 return True
             else:
                 logger.debug("Skip Node - " + concept.name)
@@ -86,7 +91,7 @@ class Neo4JGraph(ConceptGraph):
     def __init__(self, gdb):
         self.gdb = gdb
         self.db = neo4j.GraphDatabaseService(gdb)
-        logger.info("Neo4j DB @ :" + gdb)
+        logger.debug("Neo4j DB @ :" + gdb)
 
     def clearGraphDB(self):
         query = neo4j.CypherQuery(self.db, "START n=node(*) MATCH n-[r?]-m WITH n, r DELETE n, r")
@@ -103,11 +108,12 @@ class Neo4JGraph(ConceptGraph):
                 query = neo4j.CypherQuery(self.db, qs)
                 query.execute().data
             except:
-                logger.error(str(sys.exc_info()[0]))
+                em = format_exc()
+                logger.warn("Warning: %s" % (em))
 
     def addNode(self, concept):
         return self.db.create(node(name=concept.name, count=concept.count, typeName=concept.typeName))
-
+        
     def addEdge (self, parentConcept, childConcept):
         return self.db.create(rel(self.nodeDict[childConcept.name][0],
                        (parentConcept.typeName, {"count": parentConcept.count}),
@@ -124,7 +130,7 @@ class NetworkXGraph(ConceptGraph):
         self.G=nx.Graph()
         self.layout=nx.spring_layout
         if filename == None:
-            filename = Constants.gmlFile
+            filename = gmlFile
         self.filename = filename
         logger.info("GML saved to :" + self.filename)
 
@@ -133,7 +139,7 @@ class NetworkXGraph(ConceptGraph):
 
     def saveGraph(self, filename=None):
         if filename == None:
-            filename = os.getcwd() + os.sep + Constants.gmlFile
+            filename = os.getcwd() + os.sep + gmlFile
         logger.debug(str(self.G.nodes(data=True)))
         nx.write_gml(self.G, filename)
 
@@ -230,7 +236,7 @@ class PatternGraph(ConceptGraph):
             klimit = len(k)
             
         for i in range(0, klimit):
-            logger.info("Graph[%d]=%d" % (i, len(k[i])))
+            logger.debug("Graph[%d]=%d" % (i, len(k[i])))
             newDir = self.homeDir + os.sep + "graph" + str(i)
             h = k[i] 
             h.export(newDir, overwrite=True, directed=True, weighted=0.5, title=title)
@@ -246,7 +252,7 @@ class PatternGraph(ConceptGraph):
         for n in h.sorted()[:30]:
             i = i + 1
             n.fill = (0, 0.5, 1, 0.75 * n.weight)
-            logger.info("i:%d=%s" % (i, n))
+            logger.debug("i:%d=%s" % (i, n))
             newGraph.add_node(n.id)
             logger.debug("edges : %s" % n.edges)
     

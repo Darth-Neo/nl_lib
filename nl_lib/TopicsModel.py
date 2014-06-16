@@ -109,10 +109,10 @@ class TopicsModel(object):
         # training set
         self.corpus = [self.dictionary.doc2bow(text) for text in texts]
 
-        #logger.info("corpus ready")
-        #for c1 in self.corpus:
-        #    for c2 in c1:
-        #       logger.info("word: %s  count:%s  index:%s" % (self.dictionary[c2[0]], c2[1], c2[0]))
+        logger.info("corpus ready")
+        for c1 in self.corpus:
+            for c2 in c1:
+               logger.info("word: %s  count:%s  index:%s" % (self.dictionary[c2[0]], c2[1], c2[0]))
 
         tfidf = models.TfidfModel(self.corpus)
         logger.info("tfidf: " + str(tfidf))
@@ -138,11 +138,11 @@ class TopicsModel(object):
         lsiList = self.lsi.print_topics(num_topics=nt, num_words=nw)
 
         for top in lsiList:
-          logger.debug("Topic [" + str(lsiList.index(top)) + "] " + str(top))
+          logger.info("Topic [" + str(lsiList.index(top)) + "] " + str(top))
           words = list()
           for wordcluster in top.split("+"):
               wc = list()
-              wc.append(wordcluster.split("*")[1].lower().strip().translate(None, self.delchars))
+              wc.append(wordcluster.split("*")[1].lower().strip())
               wc.append(TopicsModel.convertMetric(wordcluster.split("*")[0]))
               words.append(wc)
           topics.append(words)
@@ -221,25 +221,25 @@ class TopicsModel(object):
 
         return documents, wordcount
     
-    def loadConceptsWords(self, concepts):
+    def loadConceptsWords(self, concepts, delim=" "):
         documents = list()
         texts = list()
 
         wordcount = 0
 
         # Iterate through the Concepts
-        logger.debug("Concept Name:" + concepts.name)
+        logger.info("Concept Name:" + concepts.name)
 
         for document in concepts.getConcepts().values():
-            logger.debug("Concept: %s" % document.name)
+            logger.info("Doc: %s" % document.name)
 
             for sentence in document.getConcepts().values():
-                logger.debug("Concept: %s" % sentence.name)
+                logger.info("sent: %s" % sentence.name)
 
-                for word in sentence.name.split():
+                for word in sentence.name.split(delim):
                     if len(word) > 1:
-                        logger.debug("Word: %s" % word)
-                        texts.append(word)
+                        logger.info("Word: %s" % word)
+                        texts.append(word.lower().strip())
                         wordcount += 1
 
                 documents.append(texts)

@@ -42,11 +42,11 @@ class Concepts(object):
     def cleanString(self, name):
         try:
             if isinstance(name, (str, unicode)):
-                return name.encode('utf-8','ignore')
+                return name.encode('utf-8',errors='ignore')
             else:
                 n = name.translate(None, self.delchars).strip()
             u = unicode(n, "utf-8", errors='ignore' )
-            return u.encode( "utf-8", "ignore" )
+            return u.encode( "utf-8", errors="ignore" )
         except:
             return " "
 
