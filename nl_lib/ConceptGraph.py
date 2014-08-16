@@ -114,9 +114,14 @@ class Neo4JGraph(ConceptGraph):
     def addNode(self, concept):
         return self.db.create(node(name=concept.name, count=concept.count, typeName=concept.typeName))
         
-    def addEdge (self, parentConcept, childConcept):
+    def addEdge (self, parentConcept, childConcept, type=None):
+        if type!=None:
+            typeName = type
+        else:
+            typeName = childConcept.typeName
+
         return self.db.create(rel(self.nodeDict[childConcept.name][0],
-                       (parentConcept.typeName, {"count": parentConcept.count}),
+                       (typeName, {"count": parentConcept.count}),
                        self.nodeDict[parentConcept.name][0]))
 #
 # NetworkXGraph

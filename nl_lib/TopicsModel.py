@@ -53,11 +53,9 @@ class TopicsModel(object):
     def saveTopics(self, topics):
         wordConcepts = Concepts.Concepts("TopicConcepts", "Topics")
         for topic in topics:
-            for project in topics:
-                for word in project:
-                    logger.debug("Word:" + word[0])
-                    w = wordConcepts.addConceptKeyType(word[0], "Topic")
-                    w.count = word[1]
+            logger.debug("Topic:" + topic[0])
+            w = wordConcepts.addConceptKeyType(topic[0], "Topic")
+            w.count = topic[1]
         Concepts.Concepts.saveConcepts(wordConcepts, self.topicsFile)
         return wordConcepts
 
@@ -90,9 +88,10 @@ class TopicsModel(object):
            logger.info("Text[" + str(texts.index(text)) + "] :  " + text)
 
     def logTopics(self, topics):
-        for topic in topics:
-            for word in topic:
-                logger.info("Topic[" + str(topic.index(word)) + "] :  " + str(word[0]) + "=" + str(word[1]))
+
+        l = sorted(topics, key=lambda c: abs(c[1]), reverse=True)
+        for topic in l:
+            logger.info("Topic[" + str(topic[0]) + "]=" + str(topic[1]))
 
     @staticmethod
     def convertMetric(metric):
@@ -109,10 +108,10 @@ class TopicsModel(object):
         # training set
         self.corpus = [self.dictionary.doc2bow(text) for text in texts]
 
-        logger.info("corpus ready")
-        for c1 in self.corpus:
-            for c2 in c1:
-               logger.info("word: %s  count:%s  index:%s" % (self.dictionary[c2[0]], c2[1], c2[0]))
+        #logger.info("corpus ready")
+        #for c1 in self.corpus:
+        #    for c2 in c1:
+        #       logger.info("word: %s  count:%s  index:%s" % (self.dictionary[c2[0]], c2[1], c2[0]))
 
         tfidf = models.TfidfModel(self.corpus)
         logger.info("tfidf: " + str(tfidf))
@@ -137,19 +136,23 @@ class TopicsModel(object):
 
         lsiList = self.lsi.print_topics(num_topics=nt, num_words=nw)
 
+        tp = dict()
+
         for top in lsiList:
           logger.info("Topic [" + str(lsiList.index(top)) + "] " + str(top))
-          words = list()
-          for wordcluster in top.split("+"):
-              wc = list()
-              wc.append(wordcluster.split("*")[1].lower().strip())
-              wc.append(TopicsModel.convertMetric(wordcluster.split("*")[0]))
-              words.append(wc)
-          topics.append(words)
 
-        return topics
+          for wordcluster in top.split(" +"):
+              key = wordcluster.split("*")[1].lower().strip()
+              value = TopicsModel.convertMetric(wordcluster.split("*")[0])
 
-    def computeSimilar(self, j, documentsList, projectList, threshold = 0.98):
+              if tp.has_key(key):
+                tp[key] += abs(value)
+              else:
+                tp[key] = abs(value)
+
+        return tp.items()
+
+    def computeSimilar(self, j, documentsList, threshold = 0.98):
 
         doc = documentsList[j]
 
@@ -171,30 +174,28 @@ class TopicsModel(object):
         logger.debug("shape     : %s" % (sims.shape))
 
         simsList = sims.tolist()
+        #simsList = list(enumerate(sims))
+
         logger.debug("len       : %s" % (len(simsList)))
         logger.debug("similarity: %s" % (simsList))
         logger.debug("type      : %s" % (type(simsList)))
 
-        projectSimilarity = list()
+        documentSimilarity = list()
 
         for i in range(0, len(simsList)-1):
-            if (simsList[i] > threshold) and (projectList[j] != projectList[i])  :
-                logger.debug("Project    : %s" % (projectList[j]))
-                logger.debug("Topics     : %s" % (documentsList[j]))
-                logger.debug("Similar[%s]: %s" % (projectList[i], simsList[i]))
-                logger.debug("Topics     : %s" % (documentsList[i]))
+            if (simsList[i] > threshold) and (documentsList[j] != documentsList[i])  :
+                logger.debug("Document     : %s" % (documentsList[j]))
+                logger.debug("Similar[%s]: %s" % (documentsList[i], simsList[i]))
 
                 sl = list()
-                sl.append(projectList[j])
-                sl.append(projectList[i])
                 sl.append(str(simsList[i]))
                 sl.append(documentsList[j])
                 sl.append(documentsList[i])
-                projectSimilarity.append(sl)
+                documentSimilarity.append(sl)
 
-        logger.debug("Project Similarity List %s" % (projectSimilarity))
+        logger.debug("Document Similarity List %s" % (documentSimilarity))
 
-        return projectSimilarity
+        return documentSimilarity
 
     def loadWords(self, concepts):
         documents = list()
@@ -234,15 +235,15 @@ class TopicsModel(object):
             logger.info("Doc: %s" % document.name)
 
             for sentence in document.getConcepts().values():
-                logger.info("sent: %s" % sentence.name)
+                logger.info("  sent: %s" % sentence.name)
 
                 for word in sentence.name.split(delim):
                     if len(word) > 1:
-                        logger.info("Word: %s" % word)
+                        logger.debug("    Word: %s" % word)
                         texts.append(word.lower().strip())
                         wordcount += 1
 
-                documents.append(texts)
-                texts = list()
+            documents.append(texts)
+            texts = list()
 
         return documents, wordcount
