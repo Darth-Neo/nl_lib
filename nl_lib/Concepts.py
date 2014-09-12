@@ -199,3 +199,7 @@ class Concepts(object):
             return str(v)
         except:
             return " "
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

@@ -47,3 +47,4 @@ setup(name='nl_lib',
     # project is installed.
     install_requires = ['nltk', 'pattern', 'gensim', 'networkx', 'matplotlib', 'pytagcloud', 'numpy', 'py2neo'],)
 
+
