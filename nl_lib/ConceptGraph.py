@@ -13,6 +13,8 @@ from nl_lib.Concepts import Concepts
 
 from traceback import format_exc
 
+import pygraphviz as pgv
+
 logger = Logger.setupLogging(__name__)
 
 delchars = ''.join(c for c in map(chr, range(256)) if not c.isalnum())
@@ -272,3 +274,27 @@ class PatternGraph(ConceptGraph):
         h = newGraph.split()
         
         return h
+
+#
+# GraphVizGraph
+#
+class GraphVizGraph(ConceptGraph):
+    g = None
+
+    def __init__(self):
+        self.g = pgv.AGraph(directed=True,strict=True,rankdir='LR')
+
+    def addNode(self, n, color="black"):
+        self.g.add_node(n.name, color=color)
+
+    def addEdge(self, p, c, color="black"):
+        self.g.add_edge(p.name, c.name, color=color)
+
+    def exportGraph(self, filename="example.png"):
+        logger.debug("exportGraph")
+
+        # adjust a graph parameter
+        self.g.graph_attr['epsilon']='0.001'
+        logger.debug(self.g.string()) # print dot file to standard output
+        self.g.layout('dot') # layout with dot
+        self.g.draw(filename) # write to file
