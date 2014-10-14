@@ -72,7 +72,7 @@ class ConceptGraph(object):
         return c
 
     def addConcept(self, concept):
-        concept.name = concept.name.translate(None, delchars)
+        #concept.name = concept.name.translate(None, delchars)
         if self.nodeDict.has_key(concept.name):
             logger.debug("Found Node: " + concept.name)
             c = self.nodeDict[concept.name]
@@ -104,7 +104,7 @@ class Neo4JGraph(ConceptGraph):
     def setNodeLabels(self):
         for t in self.labelDict:
             try:
-                typeName = self.labelDict[t].translate(None, self.delchars).strip()
+                #typeName = self.labelDict[t].translate(None, self.delchars).strip()
                 qs = "match (n) where (n.typeName=\"" + typeName + "\") set n:" + typeName
                 logger.info("Label :" + qs)
                 query = neo4j.CypherQuery(self.db, qs)
