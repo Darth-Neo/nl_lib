@@ -284,10 +284,10 @@ class GraphVizGraph(ConceptGraph):
     def __init__(self):
         self.g = pgv.AGraph(directed=True,strict=True,rankdir='LR')
 
-    def addNode(self, n, color="black"):
-        self.g.add_node(n.name, color=color)
+    def addNode(self, n, color="black", shape="box"):
+        self.g.add_node(n.name, color=color, shape="box")
 
-    def addEdge(self, p, c, color="black"):
+    def addEdge(self, p, c, color='green'):
         self.g.add_edge(p.name, c.name, color=color)
 
     def exportGraph(self, filename="example.png"):
