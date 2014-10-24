@@ -285,7 +285,7 @@ class GraphVizGraph(ConceptGraph):
         self.g = pgv.AGraph(directed=True,strict=True,rankdir='LR')
 
     def addNode(self, n, color="black", shape="box"):
-        self.g.add_node(n.name, color=color, shape="box")
+        self.g.add_node(n.name, color=color, shape=shape)
 
     def addEdge(self, p, c, color='green'):
         self.g.add_edge(p.name, c.name, color=color)

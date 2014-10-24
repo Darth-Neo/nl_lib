@@ -124,7 +124,7 @@ class TopicsModel(object):
         logger.info("LSI Complete")
         corpus_lsi = self.lsi[self.corpus]
 
-        logger.info("lsi.print_topics: " + str(self.lsi.print_topics))
+        logger.debug("lsi.print_topics: " + str(self.lsi.print_topics))
 
         count = 1
         topics = list()
@@ -139,7 +139,7 @@ class TopicsModel(object):
         tp = dict()
 
         for top in lsiList:
-          logger.info("Topic [" + str(lsiList.index(top)) + "] " + str(top))
+          logger.debug("Topic [" + str(lsiList.index(top)) + "] " + str(top))
 
           for wordcluster in top.split(" +"):
               key = wordcluster.split("*")[1].lower().strip()
@@ -229,13 +229,13 @@ class TopicsModel(object):
         wordcount = 0
 
         # Iterate through the Concepts
-        logger.info("Concept Name:" + concepts.name)
+        logger.debug("Concept Name:" + concepts.name)
 
         for document in concepts.getConcepts().values():
-            logger.info("Doc: %s" % document.name)
+            logger.debug("Doc: %s" % document.name)
 
             for sentence in document.getConcepts().values():
-                logger.info("  sent: %s" % sentence.name)
+                logger.debug("  sent: %s" % sentence.name)
 
                 for word in sentence.name.split(delim):
                     if len(word) > 1:
