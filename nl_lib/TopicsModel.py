@@ -114,14 +114,14 @@ class TopicsModel(object):
         #       logger.info("word: %s  count:%s  index:%s" % (self.dictionary[c2[0]], c2[1], c2[0]))
 
         tfidf = models.TfidfModel(self.corpus)
-        logger.info("tfidf: " + str(tfidf))
+        logger.debug("tfidf: " + str(tfidf))
 
         corpus_tfidf = tfidf[self.corpus]
-        logger.info("corpus_tfidf: " + str(corpus_tfidf))
+        logger.debug("corpus_tfidf: " + str(corpus_tfidf))
 
         # I can print out the topics for LSI
         self.lsi = lsimodel.LsiModel(corpus_tfidf, id2word=self.dictionary, num_topics=nt)
-        logger.info("LSI Complete")
+        logger.debug("LSI Complete")
         corpus_lsi = self.lsi[self.corpus]
 
         logger.debug("lsi.print_topics: " + str(self.lsi.print_topics))

@@ -146,7 +146,7 @@ class Concepts(object):
     @staticmethod
     def saveConcepts(conceptDict, conceptFile):
         try:
-            logger.info("Save %s" % (conceptFile))
+            logger.debug("Save %s" % (conceptFile))
             cf = open(conceptFile, "wb")
             pickle.dump(conceptDict, cf)
             cf.close()
@@ -157,7 +157,7 @@ class Concepts(object):
     def loadConcepts(conceptFile):
         conceptDict = None
         try:
-            logger.info("Load %s" % (conceptFile))
+            logger.debug("Load %s" % (conceptFile))
             cf = open(conceptFile, "rb")
             conceptDict = pickle.load(cf)
             cf.close()
