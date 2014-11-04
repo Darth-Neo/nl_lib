@@ -96,7 +96,9 @@ class Neo4JGraph(ConceptGraph):
         logger.debug("Neo4j DB @ :" + gdb)
 
     def clearGraphDB(self):
-        query = neo4j.CypherQuery(self.db, "START n=node(*) MATCH n-[r?]-m WITH n, r DELETE n, r")
+
+        #query = neo4j.CypherQuery(self.db, "START n = node(*) OPTIONAL MATCH n-[r]-() WHERE (ID(n)>0 AND ID(n)<10000) DELETE n, r")
+        query = neo4j.CypherQuery(self.db, "START n=node(*) optional MATCH n-[r]-m WITH n, r DELETE n, r")
         query.execute().data
 
     delchars = ''.join(c for c in map(chr, range(255)) if (not c.isalnum()))
@@ -104,7 +106,7 @@ class Neo4JGraph(ConceptGraph):
     def setNodeLabels(self):
         for t in self.labelDict:
             try:
-                #typeName = self.labelDict[t].translate(None, self.delchars).strip()
+                typeName = self.labelDict[t].translate(None, self.delchars).strip()
                 qs = "match (n) where (n.typeName=\"" + typeName + "\") set n:" + typeName
                 logger.info("Label :" + qs)
                 query = neo4j.CypherQuery(self.db, qs)
@@ -139,7 +141,7 @@ class NetworkXGraph(ConceptGraph):
         if filename == None:
             filename = gmlFile
         self.filename = filename
-        logger.info("GML saved to :" + self.filename)
+        logger.debug("GML saved to :" + self.filename)
 
     def clearGraphDB(self):
         self.G=nx.Graph()
