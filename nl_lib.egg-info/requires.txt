@@ -1,0 +1,8 @@
+nltk
+pattern
+gensim
+networkx
+matplotlib
+pytagcloud
+numpy
+py2neo
