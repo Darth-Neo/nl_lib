@@ -109,6 +109,23 @@ class Concepts(object):
             logger.info("%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
             p.logConcepts(n+1)
 
+    def listCSVConcepts(self, lcsv= None, n=0):
+        pc = self.getConcepts()
+
+        commas = "," * n
+
+        if lcsv == None:
+            lcsv = list()
+
+        if len(self.name) > 1:
+            output = "%s%s,%s" % (commas, self.name, self.typeName)
+            lcsv.append(output)
+
+        for p in pc.values():
+            p.listCSVConcepts(lcsv, n+2)
+
+        return lcsv
+
     def printConcepts(self, n=0):
         pc = self.getConcepts()
 

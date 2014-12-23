@@ -159,7 +159,12 @@ class NetworkXGraph(ConceptGraph):
     def addNode(self, concept):
         return self.G.add_node(concept.name, count=concept.count, typeName=concept.typeName)
 
-    def addEdge (self, parentConcept, childConcept):
+    def addEdge (self, parentConcept, childConcept, type=None):
+        if type!=None:
+            typeName = type
+        else:
+            typeName = childConcept.typeName
+
         return self.G.add_edge(parentConcept.name, childConcept.name)
 
     def saveGraphPajek(self, filename=None):
@@ -232,7 +237,12 @@ class PatternGraph(ConceptGraph):
     def addNode(self, n):
         self.g.add_node(n.name)
 
-    def addEdge(self, p, c):
+    def addEdge(self, p, c, type=None):
+        if type!=None:
+            typeName = type
+        else:
+            typeName = c.typeName
+
         self.g.add_edge(p.name, c.name, stroke=(0,0,0,0.75)) # R,G,B,A
     
     def exportGraph(self, title="Pattern Graph"):
