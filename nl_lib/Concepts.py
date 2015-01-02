@@ -78,10 +78,10 @@ class Concepts(object):
         return z
 
     def sortConcepts(self, typeName):
-        logger.info("sortConcepts - %s" % typeName)
+        logger.debug("sortConcepts - %s" % typeName)
 
         typeNameDict = self.dictChildrenType(typeName)
-        logger.info("typeNameDict : %s" % typeNameDict)
+        logger.debug("typeNameDict : %s" % typeNameDict)
 
         nl = list()
         for n in typeNameDict:
@@ -108,6 +108,17 @@ class Concepts(object):
         for p in pc.values():
             logger.info("%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
             p.logConcepts(n+1)
+
+    def cleanConcepts(self, n=0):
+        pc = self.getConcepts()
+
+        spaces = " " * n
+
+        for p in pc.values():
+            logger.debug("%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
+            p.name = p.name.strip("\"")
+            p.typeName = p.typeName.strip("\"")
+            p.cleanConcepts(n+1)
 
     def listCSVConcepts(self, lcsv= None, n=0):
         pc = self.getConcepts()

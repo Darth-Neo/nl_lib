@@ -142,7 +142,7 @@ class TopicsModel(object):
           logger.debug("Topic [" + str(lsiList.index(top)) + "] " + str(top))
 
           for wordcluster in top.split(" +"):
-              key = wordcluster.split("*")[1].lower().strip()
+              key = wordcluster.split("*")[1].lower().strip("\"")
               value = TopicsModel.convertMetric(wordcluster.split("*")[0])
 
               if tp.has_key(key):
