@@ -228,6 +228,44 @@ class Concepts(object):
         except:
             return " "
 
+    @staticmethod
+    def _lineCSV(concepts, cstr=None, n=0):
+        n += 1
+
+        spaces = " " * n
+
+        if cstr == None:
+            rs = "%s," % concepts.name
+        else:
+            rs = cstr
+
+        logger.debug("%s%d[%s]" % (spaces, n, rs))
+
+        if len(concepts.getConcepts().values()) == 0:
+            return rs + "\n"
+
+        for c in concepts.getConcepts().values():
+            rs = rs + Concepts._lineCSV(c, cstr)
+            logger.debug("%s%s[%s]" % (spaces, n, rs))
+
+        logger.debug("%s%d[%s]" % (spaces, n, rs))
+
+        return rs
+    @staticmethod
+    def outputConceptsToCSV(concepts, fileExport):
+        n = 0
+
+        #f = open(fileExport,'w')
+        #f.write("Model, Source, Type, Relationship, type, Target, Type\n")
+
+        for c in concepts.getConcepts():
+            n += 1
+            fl = Concepts._lineCSV(concepts, None)
+            logger.info("fl : %s[%s]" % (fl[:-1], n))
+
+        #f.close()
+        #logger.info("Save Model : %s" % fileExport)
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

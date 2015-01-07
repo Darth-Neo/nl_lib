@@ -78,10 +78,10 @@ class Concepts(object):
         return z
 
     def sortConcepts(self, typeName):
-        logger.info("sortConcepts - %s" % typeName)
+        logger.debug("sortConcepts - %s" % typeName)
 
         typeNameDict = self.dictChildrenType(typeName)
-        logger.info("typeNameDict : %s" % typeNameDict)
+        logger.debug("typeNameDict : %s" % typeNameDict)
 
         nl = list()
         for n in typeNameDict:
@@ -108,6 +108,17 @@ class Concepts(object):
         for p in pc.values():
             logger.info("%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
             p.logConcepts(n+1)
+
+    def cleanConcepts(self, n=0):
+        pc = self.getConcepts()
+
+        spaces = " " * n
+
+        for p in pc.values():
+            logger.debug("%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
+            p.name = p.name.strip("\"")
+            p.typeName = p.typeName.strip("\"")
+            p.cleanConcepts(n+1)
 
     def listCSVConcepts(self, lcsv= None, n=0):
         pc = self.getConcepts()
@@ -216,6 +227,44 @@ class Concepts(object):
             return str(v)
         except:
             return " "
+
+    @staticmethod
+    def _lineCSV(concepts, cstr=None, n=0):
+        n += 1
+
+        spaces = " " * n
+
+        if cstr == None:
+            rs = "%s," % concepts.name
+        else:
+            rs = cstr
+
+        logger.debug("%s%d[%s]" % (spaces, n, rs))
+
+        if len(concepts.getConcepts().values()) == 0:
+            return rs + "\n"
+
+        for c in concepts.getConcepts().values():
+            rs = rs + Concepts._lineCSV(c, cstr)
+            logger.debug("%s%s[%s]" % (spaces, n, rs))
+
+        logger.debug("%s%d[%s]" % (spaces, n, rs))
+
+        return rs
+    @staticmethod
+    def outputConceptsToCSV(concepts, fileExport):
+        n = 0
+
+        #f = open(fileExport,'w')
+        #f.write("Model, Source, Type, Relationship, type, Target, Type\n")
+
+        for c in concepts.getConcepts():
+            n += 1
+            fl = Concepts._lineCSV(concepts, None)
+            logger.info("fl : %s[%s]" % (fl[:-1], n))
+
+        #f.close()
+        #logger.info("Save Model : %s" % fileExport)
 
 if __name__ == "__main__":
     import doctest

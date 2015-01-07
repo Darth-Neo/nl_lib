@@ -1,6 +1,11 @@
 import logging
 import logging.handlers
 
+DEBUG = logging.DEBUG
+INFO  = logging.INFO
+WARN  = logging.WARN
+ERROR = logging.ERROR
+
 def setupLogging(name):
     #
     # Logging setup
@@ -30,3 +35,4 @@ def setupLogging(name):
     #    pass
     
     return logger
+

@@ -89,6 +89,9 @@ class TopicsModel(object):
 
     def logTopics(self, topics):
 
+        if topics == None or len(topics) == 0:
+            logger.error("Nothing to log!")
+            return None
         l = sorted(topics, key=lambda c: abs(c[1]), reverse=True)
         for topic in l:
             logger.info("Topic[" + str(topic[0]) + "]=" + str(topic[1]))
@@ -101,6 +104,10 @@ class TopicsModel(object):
 
     def computeTopics(self, texts, nt=50, nw=5):
         self.texts = texts
+
+        if texts == None or len(texts) == 0:
+            logger.error("No texts to use!")
+            return None
 
         # test set
         self.dictionary = corpora.Dictionary(texts)
@@ -142,7 +149,7 @@ class TopicsModel(object):
           logger.debug("Topic [" + str(lsiList.index(top)) + "] " + str(top))
 
           for wordcluster in top.split(" +"):
-              key = wordcluster.split("*")[1].lower().strip()
+              key = wordcluster.split("*")[1].lower().strip("\"")
               value = TopicsModel.convertMetric(wordcluster.split("*")[0])
 
               if tp.has_key(key):
