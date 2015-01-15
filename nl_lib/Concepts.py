@@ -172,11 +172,11 @@ class Concepts(object):
             self.addConcept(p, typeConcept)
         
     @staticmethod
-    def saveConcepts(conceptDict, conceptFile):
+    def saveConcepts(concepts, conceptFile):
         try:
-            logger.debug("Save %s" % (conceptFile))
+            logger.info("Saving Concepts : %s : %s[%d][%s]" % (conceptFile, concepts.name, concepts.count, concepts.typeName))
             cf = open(conceptFile, "wb")
-            pickle.dump(conceptDict, cf)
+            pickle.dump(concepts, cf)
             cf.close()
         except:
             logger.error(str(sys.exc_info()[0]))
@@ -185,14 +185,14 @@ class Concepts(object):
     def loadConcepts(conceptFile):
         conceptDict = None
         try:
-            logger.debug("Load %s" % (conceptFile))
             cf = open(conceptFile, "rb")
-            conceptDict = pickle.load(cf)
+            concepts = pickle.load(cf)
+            logger.info("Loaded Concepts : %s : %s[%d][%s]" % (conceptFile, concepts.name, concepts.count, concepts.typeName))
             cf.close()
         except:
             logger.error(str(sys.exc_info()[0]))
             
-        return conceptDict
+        return concepts
 
     @staticmethod
     def decode_utf8(v, encoding="utf-8"):
