@@ -96,9 +96,7 @@ class Neo4JGraph(ConceptGraph):
         logger.debug("Neo4j DB @ :" + gdb)
 
     def clearGraphDB(self):
-
-        #query = neo4j.CypherQuery(self.db, "START n = node(*) OPTIONAL MATCH n-[r]-() WHERE (ID(n)>0 AND ID(n)<10000) DELETE n, r")
-        query = neo4j.CypherQuery(self.db, "START n=node(*) optional MATCH n-[r]-m WITH n, r DELETE n, r")
+        query = neo4j.CypherQuery(self.db, "MATCH (n) DELETE n")
         query.execute().data
 
     def query(self, qs):
@@ -120,7 +118,15 @@ class Neo4JGraph(ConceptGraph):
                 logger.warn("Warning: %s" % (em))
 
     def addNode(self, concept):
-        return self.db.create(node(name=concept.name, count=concept.count, typeName=concept.typeName))
+        qs = "MERGE (n {name:\"%s\", count:%d, typeName:\"%s\"})" % (concept.name, concept.count, concept.typeName)
+
+        logger.debug("Node Query : '%s'" % qs)
+
+        query = neo4j.CypherQuery(self.db, qs)
+
+        return query.execute().data
+
+        #return self.db.create(node(name=concept.name, count=concept.count, typeName=concept.typeName))
         
     def addEdge (self, parentConcept, childConcept, type=None):
         if type!=None:
@@ -128,9 +134,27 @@ class Neo4JGraph(ConceptGraph):
         else:
             typeName = childConcept.typeName
 
-        return self.db.create(rel(self.nodeDict[childConcept.name][0],
-                       (typeName, {"count": parentConcept.count}),
-                       self.nodeDict[parentConcept.name][0]))
+        qs0 = "match "
+        qs1 = "(n {name : \"%s\", typeName:\"%s\"}), " % (parentConcept.name, parentConcept.typeName)
+        logger.debug("query1 %s" % qs1)
+
+        qs2 = "(m {name : \"%s\", typeName:\"%s\"}) " % (childConcept.name, childConcept.typeName)
+        logger.debug("query2 %s" % qs2)
+
+        qs3 = "merge (n)-[r:%s {typeName:\"%s\"}]->(m)" % (typeName, typeName)
+        logger.debug("query3 %s" % qs3)
+
+        qs = qs0 + qs1 + qs2 + qs3
+
+        logger.debug("Edge Query %s" % qs)
+
+        query = neo4j.CypherQuery(self.db, qs)
+
+        return query.execute().data
+
+        #return self.db.create(rel(self.nodeDict[childConcept.name][0],
+        #               (typeName, {"count": parentConcept.count}),
+        #               self.nodeDict[parentConcept.name][0]))
 #
 # NetworkXGraph
 #
@@ -195,25 +219,6 @@ class NetworkXGraph(ConceptGraph):
                  node_size = [16 * graph.degree(n) for n in graph],
                  node_color = [graph.depth[n] for n in graph],
                  with_labels = False)
-        plt.show()
-
-    def drawEgoGraph(self):
-        logger.debug(str(self.G.nodes(data=True)))
-
-        # find node with largest degree
-        node_and_degree=self.G.degree()
-        (largest_hub,degree)=sorted(node_and_degree.items(),key=itemgetter(1))[-1]
-
-        # Create ego graph of main hub
-        hub_ego=nx.ego_graph(self.G,largest_hub)
-
-        # Draw graph
-        pos=nx.spring_layout(hub_ego)
-        nx.draw(hub_ego,pos,node_color='b',node_size=50,with_labels=True)
-
-        # Draw ego as large and red
-        nx.draw_networkx_nodes(hub_ego,pos,nodelist=[largest_hub],node_size=300,node_color='r')
-        plt.savefig('ego_graph.png')
         plt.show()
 
 #
