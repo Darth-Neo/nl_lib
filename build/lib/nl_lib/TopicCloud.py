@@ -5,9 +5,20 @@ from nl_lib import Concepts
 from nl_lib import Logger
 logger = Logger.setupLogging(__name__)
 
+from nl_lib.Constants import *
+
 from pytagcloud import create_tag_image, make_tags
 #from pytagcloud.lang.counter import get_tag_counts
 from operator import itemgetter
+
+import nltk
+from nltk import tokenize, tag, chunk
+from nltk.corpus import webtext
+from nltk.collocations import BigramCollocationFinder, TrigramCollocationFinder
+from nltk.metrics import BigramAssocMeasures, TrigramAssocMeasures
+from nltk.corpus import stopwords
+from nltk.corpus import wordnet as wn
+from nltk.stem import PorterStemmer, WordNetLemmatizer
 
 #
 # TopicCloud to create a Tag Cloud for Concepts
@@ -16,6 +27,7 @@ class TopicCloud(object):
     topicsConcepts = None
     homeDir = None
     imageFile = None
+    lemmatizer = None
 
     def __init__(self, topicsConcepts, homeDir=None):
         self.topicsConcepts = topicsConcepts
@@ -31,6 +43,8 @@ class TopicCloud(object):
         self.homeDir = homeDir
         self.imageFile = self.homeDir + "topicCloud.png"
 
+        self.lemmatizer = WordNetLemmatizer()
+
     def _getDictConcepts(self, concepts, typeName, dictConcepts):
         if len(concepts.getConcepts()) == 0:
             return None
@@ -40,9 +54,27 @@ class TopicCloud(object):
                 if dictConcepts.has_key(p.name):
                     dictConcepts[p.name] = dictConcepts[p.name] + p.count
                 else:
-                    dictConcepts[p.name] = p.count
+                    w = self.getLemma(p.name)
+                    dictConcepts[w] = p.count
+                    #dictConcepts[p.name] = p.count
 
-            self._getDictConcepts(p, typeName, dictConcepts)  
+            self._getDictConcepts(p, typeName, dictConcepts)
+
+    def getLemma(self, name):
+
+        if name.stip(" ") in stopwords:
+            logger.info("Found Stopword : %s" % name)
+            return ""
+
+        sn = ""
+
+        for x in name.split(" "):
+            lemmaWord = self.lemmatizer.lemmatize(x.lower())
+            sn = sn + " " + lemmaWord
+
+        logger.info("New Lemma : %s" % sn)
+
+        return sn
     
     def createCloudImage(self, typeName="Topic", size_x=1200, size_y=900, numWords=100, scale = 1.0):
         logger.info("Saving Tag Cloud - %s" % self.imageFile)
