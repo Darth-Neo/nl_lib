@@ -5,7 +5,7 @@ from nl_lib import Concepts
 from nl_lib import Logger
 logger = Logger.setupLogging(__name__)
 
-from nl_lib.Constants import *
+import nl_lib.Constants as NLC
 
 from pytagcloud import create_tag_image, make_tags
 #from pytagcloud.lang.counter import get_tag_counts
@@ -62,7 +62,7 @@ class TopicCloud(object):
 
     def getLemma(self, name):
 
-        if name.stip(" ") in stopwords:
+        if name.stip(" ") in NLC.stopwords:
             logger.info("Found Stopword : %s" % name)
             return ""
 
