@@ -62,6 +62,8 @@ class TopicCloud(object):
 
     def getLemma(self, name):
 
+        name.replace(".", "")
+
         if name.stip(" ") in NLC.stopwords:
             logger.info("Found Stopword : %s" % name)
             return ""
