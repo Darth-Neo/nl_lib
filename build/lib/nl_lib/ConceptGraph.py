@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+#
+# Concept Class for NLP
+#
+__VERSION__ = 0.1
+__author__ = 'morrj140'
+
 import os
 import sys
 import networkx as nx
@@ -110,6 +117,32 @@ class Neo4JGraph(ConceptGraph):
             try:
                 typeName = self.labelDict[t].translate(None, self.delchars).strip()
                 qs = "match (n) where (n.typeName=\"" + typeName + "\") set n:" + typeName
+                logger.info("Label :" + qs)
+                query = self.query(qs)
+                query.execute().data
+            except:
+                em = format_exc()
+                logger.warn("Warning: %s" % (em))
+
+    def createIndices(self):
+        for t in self.labelDict:
+            try:
+                typeName = self.labelDict[t].translate(None, self.delchars).strip()
+                qs = "CREATE INDEX ON :%s (name)" % (typeName)
+                #qs = "match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
+                logger.info("Label :" + qs)
+                query = neo4j.CypherQuery(self.db, qs)
+                query.execute().data
+            except:
+                em = format_exc()
+                logger.warn("Warning: %s" % (em))
+
+    def dropIndices(self):
+        for t in self.labelDict:
+            try:
+                typeName = self.labelDict[t].translate(None, self.delchars).strip()
+                qs = "DROP INDEX ON :%s (name)" % (typeName)
+                #qs = "match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
                 logger.info("Label :" + qs)
                 query = neo4j.CypherQuery(self.db, qs)
                 query.execute().data

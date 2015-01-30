@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+#
+# Concept Class for NLP
+#
+__VERSION__ = 0.1
+__author__ = 'morrj140'
+
 """
 	Pickle vs JSON by Konstantin Kovshenin
 	Feel free to use this code as you wish

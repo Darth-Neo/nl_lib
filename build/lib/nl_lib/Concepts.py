@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+#
+# Concept Class for NLP
+#
+__VERSION__ = 0.1
+__author__ = 'morrj140'
+
 import os
 import sys
 import pickle
@@ -40,6 +47,12 @@ class Concepts(object):
         return self.cd
 
     def cleanString(self, name):
+        '''
+        :param name: name
+        :return: string
+        Note: Encode a string to UTF-8
+        Note: Decode a string to Unicode
+        '''
         try:
             if isinstance(name, (str, unicode)):
                 return name.encode('utf-8',errors='ignore')

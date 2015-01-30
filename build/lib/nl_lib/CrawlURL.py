@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+#
+# Concept Class for NLP
+#
+__VERSION__ = 0.1
+__author__ = 'morrj140'
+
 
 import re
 import sys

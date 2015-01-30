@@ -1,4 +1,11 @@
-import sys 
+#!/usr/bin/env python
+#
+# Concept Class for NLP
+#
+__VERSION__ = 0.1
+__author__ = 'morrj140'
+
+import sys
 import os
 import time
 import Logger

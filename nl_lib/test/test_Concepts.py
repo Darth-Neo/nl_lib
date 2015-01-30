@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+#
+# Concept Testing
+#
+__VERSION__ = 0.1
+__author__ = 'morrj140'
+
 import os
 import sys
 

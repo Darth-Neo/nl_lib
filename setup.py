@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+#
+# Concept Class for NLP
+#
+__VERSION__ = '0.2'
+__author__ = 'morrj140'
+
 from setuptools import setup, find_packages
 import codecs
 import os
@@ -6,7 +13,7 @@ import re
 here = os.path.abspath(os.path.dirname(__file__))
 
 setup(name='nl_lib',
-      version='0.1',
+      version=__VERSION__,
       description='Tools for Natural Language Processing',
       url='http://github.com/darth-neo/nl_lib',
       author='Darth Neo',

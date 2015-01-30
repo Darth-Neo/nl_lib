@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+#
+# Example of how to do testing
+#
+__VERSION__ = 0.1
+__author__ = 'morrj140'
+
 """
 This is the "example" module.
 
