@@ -114,15 +114,25 @@ class Neo4JGraph(ConceptGraph):
 
     def setNodeLabels(self):
         for t in self.labelDict:
-            try:
-                typeName = self.labelDict[t].translate(None, self.delchars).strip()
-                qs = "match (n) where (n.typeName=\"" + typeName + "\") set n:" + typeName
-                logger.info("Label :" + qs)
+            typeName = self.labelDict[t].translate(None, self.delchars).strip()
+            qs = "match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
+            logger.info("Label :" + qs)
+            query = self.query(qs)
+
+            if typeName.find("Relationship") != -1:
+                qs = "match (n) where (n.typeName=\"%s\") set n:Relation" % (typeName)
+                logger.info("HyperEdge :" + qs)
                 query = self.query(qs)
-                query.execute().data
-            except:
-                em = format_exc()
-                logger.warn("Warning: %s" % (em))
+
+            elif typeName.find("Business") != -1:
+                qs = "match (n) where (n.typeName=\"%s\") set n:Business" % (typeName)
+                logger.info("HyperEdge :" + qs)
+                query = self.query(qs)
+                
+            elif typeName.find("Application") != -1:
+                qs = "match (n) where (n.typeName=\"%s\") set n:Application" % (typeName)
+                logger.info("HyperEdge :" + qs)
+                query = self.query(qs)
 
     def createIndices(self):
         for t in self.labelDict:
