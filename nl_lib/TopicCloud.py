@@ -71,7 +71,7 @@ class TopicCloud(object):
 
         name.replace(".", "")
 
-        if name.stip(" ") in NLC.stopwords:
+        if name.strip(" ") in NLC.stop:
             logger.info("Found Stopword : %s" % name)
             return ""
 
