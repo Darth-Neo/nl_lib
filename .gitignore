@@ -1,5 +1,6 @@
 *.pyc
 build/*
+dist/*
 nl_lib/test/Dictionary.dict
 nl_lib/test/corpus.mm
 nl_lib/test/corpus.mm.index

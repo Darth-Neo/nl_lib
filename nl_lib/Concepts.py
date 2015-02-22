@@ -129,8 +129,9 @@ class Concepts(object):
 
         prop = c.getProperties()
 
-        for k , v in prop.items():
-            logger.info("%sKey %s => Value %s" % (spaces, k, v))
+        if prop != None:
+            for k , v in prop.items():
+                logger.info("%sKey %s => Value %s" % (spaces, k, v))
     
     def logConcepts(self, n=0):
         pc = self.getConcepts()
