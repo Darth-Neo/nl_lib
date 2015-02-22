@@ -1,2 +1,13 @@
 *.pyc
 build/*
+nl_lib/test/Dictionary.dict
+nl_lib/test/corpus.mm
+nl_lib/test/corpus.mm.index
+nl_lib/test/export.gml
+nl_lib/test/export.p
+nl_lib/test/export.png
+nl_lib/test/html/
+nl_lib/test/model.lsi
+nl_lib/test/model.lsi.projection
+nl_lib/test/topicsDict.p
+nl_lib/log.txt

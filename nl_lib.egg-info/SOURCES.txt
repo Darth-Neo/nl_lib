@@ -15,6 +15,10 @@ nl_lib/TopicsModel.py
 nl_lib/__init__.py
 nl_lib/nosy.py
 nl_lib/pickle_vs_json.py
+nl_lib/test_Concepts.py
+nl_lib/test_ConceptsGraph.py
+nl_lib/test_Constants.py
+nl_lib/test_TopicsModel.py
 nl_lib.egg-info/PKG-INFO
 nl_lib.egg-info/SOURCES.txt
 nl_lib.egg-info/dependency_links.txt
