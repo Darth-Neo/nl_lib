@@ -22,6 +22,7 @@ class Concepts(object):
     urn = None
     cd = None
     conceptFile = None
+    properties = None
     
     delchars = ''.join(c for c in map(chr, range(255)) if (not c.isalnum() and c != ' '))
 
@@ -31,7 +32,8 @@ class Concepts(object):
         self.name = self.cleanString(name)
         self.typeName = self.cleanString(typeName)
         self.cd = dict()
-        self.count = 1
+        self.properties = dict()
+        self.count = 0
 
     def __getitem__(self, id):
         try:
@@ -45,6 +47,16 @@ class Concepts(object):
 
     def getConcepts(self):
         return self.cd
+
+    def setProperties(self, props):
+
+        if isinstance(props, dict):
+            self.properties = props
+        else:
+            logger.warn("Props given not Dict()!")
+
+    def getProperties(self):
+        return self.properties
 
     def cleanString(self, name):
         '''
@@ -82,7 +94,7 @@ class Concepts(object):
 
         return conceptFilter
 
-    def sdp(self, x, y):
+    def _sdp(self, x, y):
         try:
             z = int((float(x * y) / float(x + y)) * 100.00)
         except:
@@ -105,13 +117,20 @@ class Concepts(object):
             c = typeNameDict[n].getConcepts()
             for v in c:
                 wl.append(c[v].name)
-            cl.append(self.sdp(typeNameDict[n].count, len(wl))) #1
+            cl.append(self._sdp(typeNameDict[n].count, len(wl))) #1
             cl.append(typeNameDict[n].count) #2
             cl.append(wl) #3
             cl.append(len(wl)) #4
             nl.append(cl)
 
         return sorted(nl, key=lambda c: abs(c[1]), reverse=False)
+
+    def _logProperties(self, c, spaces):
+
+        prop = c.getProperties()
+
+        for k , v in prop.items():
+            logger.info("%sKey %s => Value %s" % (spaces, k, v))
     
     def logConcepts(self, n=0):
         pc = self.getConcepts()
@@ -120,6 +139,8 @@ class Concepts(object):
 
         for p in pc.values():
             logger.info("%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
+            self._logProperties(p, spaces)
+
             p.logConcepts(n+1)
 
     def cleanConcepts(self, n=0):
@@ -167,22 +188,24 @@ class Concepts(object):
         
         if self.cd.has_key(k):
             c = self.cd[k]
-            c.incCount()
+            self.incCount()
             logger.debug("Found:     %s\tCount:%s" % (k, c.count))
         else:
             c = Concepts(k, t)
+            self.incCount()
             self.cd[k] = c
             logger.debug("Not found: %s->%s" % (k, t))
+
         return c
 
     def addConcept(self, concept):
         logger.debug("addConcept: %s " % concept.name)
         self.cd[concept.name] = concept
         
-    def addListConcepts(self, listConcepts, typeConcept):
+    def addListConcepts(self, listConcepts):
         for p in listConcepts:
-            logger.debug(p + ":" + typeConcept)
-            self.addConcept(p, typeConcept)
+            logger.debug("%s:%s" % (p.name, p.typeName))
+            self.addConcept(p)
         
     @staticmethod
     def saveConcepts(concepts, conceptFile):
@@ -196,7 +219,11 @@ class Concepts(object):
 
     @staticmethod        
     def loadConcepts(conceptFile):
-        conceptDict = None
+        concepts = None
+
+        if not os.path.exists(conceptFile):
+            logger.error("%s : Does Not Exist!" % conceptFile)
+
         try:
             cf = open(conceptFile, "rb")
             concepts = pickle.load(cf)

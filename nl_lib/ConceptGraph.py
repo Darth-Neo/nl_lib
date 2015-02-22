@@ -5,23 +5,18 @@
 __VERSION__ = 0.1
 __author__ = 'morrj140'
 
-import os
-import sys
-import networkx as nx
-import matplotlib.pyplot as plt
-from py2neo import neo4j, node, rel
-from pattern.graph  import Graph
-
-from nl_lib import Logger
-logger = Logger.setupLogging(__name__)
-
 from nl_lib.Constants import *
-from nl_lib.Concepts import Concepts
-
 from traceback import format_exc
 
-import pygraphviz as pgv
+import networkx as nx
+import matplotlib.pyplot as plt
 
+import pygraphviz as pgv
+from pattern.graph import Graph
+
+from py2neo import neo4j, node, rel
+
+from nl_lib import Logger
 logger = Logger.setupLogging(__name__)
 
 delchars = ''.join(c for c in map(chr, range(256)) if not c.isalnum())
@@ -116,12 +111,12 @@ class Neo4JGraph(ConceptGraph):
         for t in self.labelDict:
             typeName = self.labelDict[t].translate(None, self.delchars).strip()
             qs = "match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
-            logger.info("Label :" + qs)
+            logger.debug("Label :" + qs)
             query = self.query(qs)
 
             if typeName.find("Relationship") != -1:
                 qs = "match (n) where (n.typeName=\"%s\") set n:Relation" % (typeName)
-                logger.info("HyperEdge :" + qs)
+                logger.debug("HyperEdge :" + qs)
                 query = self.query(qs)
 
             elif typeName.find("Business") != -1:
@@ -131,7 +126,7 @@ class Neo4JGraph(ConceptGraph):
 
             elif typeName.find("Application") != -1:
                 qs = "match (n) where (n.typeName=\"%s\") set n:Application" % (typeName)
-                logger.info("HyperEdge :" + qs)
+                logger.debug("HyperEdge :" + qs)
                 query = self.query(qs)
 
     def createIndices(self):
@@ -161,7 +156,17 @@ class Neo4JGraph(ConceptGraph):
                 logger.warn("Warning: %s" % (em))
 
     def addNode(self, concept):
-        qs = "MERGE (n {name:\"%s\", count:%d, typeName:\"%s\"})" % (concept.name, concept.count, concept.typeName)
+
+        prop = concept.getProperties()
+
+        if len(prop) != 0:
+            ps = ""
+            for k, v in prop:
+                ps = ps + ", \"%s\":\"%s\""
+
+            qs = "MERGE (n {name:\"%s\", %s, count:%d, typeName:\"%s\"})" % (concept.name, ps, concept.count, concept.typeName)
+        else:
+            qs = "MERGE (n {name:\"%s\", count:%d, typeName:\"%s\"})" % (concept.name, concept.count, concept.typeName)
 
         logger.debug("Node Query : '%s'" % qs)
 
