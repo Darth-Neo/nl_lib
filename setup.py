@@ -52,6 +52,6 @@ setup(name='nl_lib',
 
     # List run-time dependencies here.  These will be installed by pip when your
     # project is installed.
-    install_requires = ['nltk', 'pattern', 'gensim', 'networkx', 'matplotlib', 'pytagcloud', 'numpy', 'py2neo'],)
+    install_requires = ['nltk', 'pattern', 'gensim', 'networkx', 'matplotlib', 'pywordcloud', 'wordcloud', 'numpy', 'py2neo'],)
 
 
