@@ -27,14 +27,14 @@ class TopicCloud(object):
     imageFile = None
     lemmatizer = None
 
-    def __init__(self, topicsConcepts, homeDir=None, font_path=None):
+    def __init__(self, topicsConcepts, homeDir=None, font_path=None, imageFile=None):
         self.topicsConcepts = topicsConcepts
 
         if homeDir == None:
-            homeDir = os.getcwd() + os.sep
+            self.homeDir = os.getcwd() + os.sep
             
-        self.homeDir = homeDir
-        self.imageFile = self.homeDir + u"topicCloud.png"
+        if imageFile == None:
+            self.imageFile = self.homeDir + u"topicCloud.png"
 
         self.lemmatizer = WordNetLemmatizer()
 
