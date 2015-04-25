@@ -40,6 +40,8 @@ class TopicCloud(object):
 
         if font_path == None:
             self.font_path=u'DroidSans.ttf'
+        else:
+            self.font_path = font_path
 
     def _getDictConcepts(self, concepts, typeName, dictConcepts=None):
         if dictConcepts == None:
@@ -51,10 +53,13 @@ class TopicCloud(object):
         for p in concepts.getConcepts().values():
             if p.typeName == typeName:
                 if dictConcepts.has_key(p.name):
-                    dictConcepts[p.name] = dictConcepts[p.name] + p.count
+                    dictConcepts[p.name] = dictConcepts[p.name] + 1
                 else:
                     w = self.getLemma(p.name)
-                    dictConcepts[w] = p.count
+                    if p.count == 0:
+                        dictConcepts[w] = 1
+                    else:
+                        dictConcepts[w] = p.count
 
             self._getDictConcepts(p, typeName, dictConcepts)
 
@@ -70,7 +75,7 @@ class TopicCloud(object):
             lemmaWord = self.lemmatizer.lemmatize(x.lower())
             sn = sn + " " + lemmaWord
 
-        logger.info(u"New Lemma : %s" % sn)
+        logger.debug(u"New Lemma : %s" % sn)
 
         return sn
 
@@ -79,6 +84,9 @@ class TopicCloud(object):
         logger.info(u"Starting with %d Topics" % len(self.topicsConcepts.getConcepts()))
 
         dictConcepts = self._getDictConcepts(self.topicsConcepts, typeName)
+
+        if len(dictConcepts) == 0:
+            return None
 
         for d in dictConcepts.keys():
             dictConcepts[d] = dictConcepts[d] + dictConcepts[d] * scale

@@ -27,7 +27,7 @@ setup(name='nl_lib',
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 3 - Beta',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',

@@ -1,6 +1,9 @@
 *.pyc
 build/*
+build/lib/*
+build/lib/nl_lib/*.py
 dist/*
+nl_lib/*.png
 nl_lib/test/Dictionary.dict
 nl_lib/test/corpus.mm
 nl_lib/test/corpus.mm.index
