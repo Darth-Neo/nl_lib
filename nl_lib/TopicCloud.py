@@ -28,15 +28,20 @@ class TopicCloud(object):
     lemmatizer = None
 
     def __init__(self, topicsConcepts, homeDir=None, font_path=None, imageFile=None):
+
         self.topicsConcepts = topicsConcepts
+
+        self.lemmatizer = WordNetLemmatizer()
 
         if homeDir == None:
             self.homeDir = os.getcwd() + os.sep
+        else:
+            self.homeDir = homeDir
             
         if imageFile == None:
             self.imageFile = self.homeDir + u"topicCloud.png"
-
-        self.lemmatizer = WordNetLemmatizer()
+        else:
+            self.imageFile = imageFile
 
         if font_path == None:
             self.font_path = self.homeDir + u'DroidSans.ttf'
