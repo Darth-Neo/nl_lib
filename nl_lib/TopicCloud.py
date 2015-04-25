@@ -2,30 +2,21 @@
 #
 # Concept Class for NLP
 #
-__VERSION__ = 0.1
-__author__ = 'morrj140'
+__VERSION__ = 0.2
+__author__ = u'morrj140'
 
 import os
-import sys
-
-from nl_lib import Concepts
-from nl_lib import Logger
-logger = Logger.setupLogging(__name__)
-
-import nl_lib.Constants as NLC
-
-from pytagcloud import create_tag_image, make_tags
-#from pytagcloud.lang.counter import get_tag_counts
 from operator import itemgetter
 
-import nltk
-from nltk import tokenize, tag, chunk
-from nltk.corpus import webtext
-from nltk.collocations import BigramCollocationFinder, TrigramCollocationFinder
-from nltk.metrics import BigramAssocMeasures, TrigramAssocMeasures
-from nltk.corpus import stopwords
-from nltk.corpus import wordnet as wn
+from nl_lib.Logger import *
+logger = setupLogging(__name__)
+logger.setLevel(INFO)
+
+from nl_lib.Concepts import Concepts
 from nltk.stem import PorterStemmer, WordNetLemmatizer
+
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud, STOPWORDS
 
 #
 # TopicCloud to create a Tag Cloud for Concepts
@@ -36,23 +27,24 @@ class TopicCloud(object):
     imageFile = None
     lemmatizer = None
 
-    def __init__(self, topicsConcepts, homeDir=None):
+    def __init__(self, topicsConcepts, homeDir=None, font_path=None):
         self.topicsConcepts = topicsConcepts
 
-        for topic in self.topicsConcepts.getConcepts().values():
-            if topic.count == 0:
-                logger.info("deleted %s from topics" % topic.name)
-                del self.topicsConcepts.getConcepts()[topic.name]
-    
         if homeDir == None:
             homeDir = os.getcwd() + os.sep
             
         self.homeDir = homeDir
-        self.imageFile = self.homeDir + "topicCloud.png"
+        self.imageFile = self.homeDir + u"topicCloud.png"
 
         self.lemmatizer = WordNetLemmatizer()
 
-    def _getDictConcepts(self, concepts, typeName, dictConcepts):
+        if font_path == None:
+            self.font_path=u'DroidSans.ttf'
+
+    def _getDictConcepts(self, concepts, typeName, dictConcepts=None):
+        if dictConcepts == None:
+            dictConcepts = dict()
+
         if len(concepts.getConcepts()) == 0:
             return None
 
@@ -63,17 +55,14 @@ class TopicCloud(object):
                 else:
                     w = self.getLemma(p.name)
                     dictConcepts[w] = p.count
-                    #dictConcepts[p.name] = p.count
 
             self._getDictConcepts(p, typeName, dictConcepts)
+
+        return dictConcepts
 
     def getLemma(self, name):
 
         name.replace(".", "")
-
-        if name.strip(" ") in NLC.stop:
-            logger.info("Found Stopword : %s" % name)
-            return ""
 
         sn = ""
 
@@ -81,26 +70,47 @@ class TopicCloud(object):
             lemmaWord = self.lemmatizer.lemmatize(x.lower())
             sn = sn + " " + lemmaWord
 
-        logger.info("New Lemma : %s" % sn)
+        logger.info(u"New Lemma : %s" % sn)
 
         return sn
-    
-    def createCloudImage(self, typeName="Topic", size_x=1200, size_y=900, numWords=100, scale = 1.0):
-        logger.info("Saving Tag Cloud - %s" % self.imageFile)
-        logger.info("Starting with %d Topics" % len(self.topicsConcepts.getConcepts()))
 
-        dictConcepts = dict()
-        self._getDictConcepts(self.topicsConcepts, typeName, dictConcepts)
+    def createTagCloud(self, typeName=u"Topic", size_x=1800, size_y=1400, numWords=100, scale = 1.0):
+
+        logger.info(u"Starting with %d Topics" % len(self.topicsConcepts.getConcepts()))
+
+        dictConcepts = self._getDictConcepts(self.topicsConcepts, typeName)
 
         for d in dictConcepts.keys():
             dictConcepts[d] = dictConcepts[d] + dictConcepts[d] * scale
-        
+
         e = sorted(dictConcepts.iteritems(), key=itemgetter(1), reverse=True)
-        logger.debug("e = %s" % e)
+        logger.debug(u"e = %s" % e)
 
-        e = e[1:numWords]
+        tags = " ".join([x * int(y) for x, y in e])
 
-        tags = make_tags(e, maxsize=numWords)
+        wordcloud = WordCloud(
+              font_path=self.font_path,
+              stopwords=STOPWORDS,
+              background_color=u'white',
+              width=size_x,
+              height=size_y
+             ).generate(tags)
 
-        create_tag_image(tags, self.imageFile, size=(size_x, size_y), fontname='Droid Sans')
+        plt.imshow(wordcloud)
+        plt.axis(u'off')
+        plt.savefig(self.imageFile, dpi=300)
+        #plt.show()
 
+        logger.info(u"Saving Tag Cloud - %s" % self.imageFile)
+
+if __name__ == u"__main__":
+    logger.debug(u"CWD : %s" % os.getcwd())
+
+    conceptFile = u"./test/topicsDict.p"
+    topic = u"Topic"
+
+    concepts = Concepts.loadConcepts(conceptFile)
+
+    tc = TopicCloud(concepts)
+
+    tc.createTagCloud(topic)

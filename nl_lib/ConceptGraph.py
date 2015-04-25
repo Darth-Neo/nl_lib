@@ -244,7 +244,7 @@ class NetworkXGraph(ConceptGraph):
             filename = "concept.net"
         nx.write_pajek(self.G,filename)
         
-    def drawGraph(self, filename=None):
+    def drawGraph(self, GML_ONLY=True, filename=None):
         if filename == None:
             filename = imageFile
         logger.debug(str(self.G.nodes(data=True)))
@@ -253,13 +253,12 @@ class NetworkXGraph(ConceptGraph):
         #nx.write_gml(self.G,"people.gml")
         #nx.write_graphml(self.G,"people2.gml")
 
-        nx.write_gml(self.G, self.filename)
-
-        pos=nx.spring_layout(self.G,iterations=500)
-
-        nx.draw(self.G, pos, node_size=200,cmap=plt.cm.Blues, with_labels=True)
-
-        plt.show()
+        if GML_ONLY == True:
+            nx.write_gml(self.G, self.filename)
+        else:
+            pos=nx.spring_layout(self.G,iterations=500)
+            nx.draw(self.G, pos, node_size=200,cmap=plt.cm.Blues, with_labels=True)
+            plt.show()
 
     def drawSocialGraph(self):
         graph = self.G
