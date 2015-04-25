@@ -352,6 +352,12 @@ class GraphVizGraph(ConceptGraph):
     def __init__(self):
         self.g = pgv.AGraph(directed=True,strict=True,rankdir='LR')
 
+        #
+        # Hack to get GraphViz to work
+        #
+        os.environ[u'PATH'] = u"%s:/opt/local/bin" % os.environ[u'PATH']
+
+
     def addNode(self, n, color="black", shape="box"):
         self.g.add_node(n.name, color=color, shape=shape)
 
