@@ -39,7 +39,7 @@ class TopicCloud(object):
         self.lemmatizer = WordNetLemmatizer()
 
         if font_path == None:
-            self.font_path=u'DroidSans.ttf'
+            self.font_path = self.homeDir + u'DroidSans.ttf'
         else:
             self.font_path = font_path
 
