@@ -189,11 +189,11 @@ class Concepts(object):
         
         if self.cd.has_key(k):
             c = self.cd[k]
-            self.incCount()
+            c.incCount()
             logger.debug("Found:     %s\tCount:%s" % (k, c.count))
         else:
             c = Concepts(k, t)
-            self.incCount()
+            c.incCount()
             self.cd[k] = c
             logger.debug("Not found: %s->%s" % (k, t))
 

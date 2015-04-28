@@ -12,6 +12,7 @@ from nl_lib.Logger import *
 logger = setupLogging(__name__)
 logger.setLevel(INFO)
 
+from nl_lib.Constants import *
 from nl_lib.Concepts import Concepts
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 
@@ -96,7 +97,7 @@ class TopicCloud(object):
         for d in dictConcepts.keys():
             dictConcepts[d] = dictConcepts[d] + dictConcepts[d] * scale
 
-        e = sorted(dictConcepts.iteritems(), key=itemgetter(1), reverse=True)
+        e = sorted(dictConcepts.iteritems(), key=itemgetter(1), reverse=True)[:numWords]
         logger.debug(u"e = %s" % e)
 
         tags = " ".join([x * int(y) for x, y in e])
