@@ -16,8 +16,9 @@ from pattern.graph import Graph
 
 from py2neo import neo4j, node, rel
 
-from nl_lib import Logger
-logger = Logger.setupLogging(__name__)
+from nl_lib.Logger import *
+logger = setupLogging(__name__)
+logger.setLevel(INFO)
 
 delchars = ''.join(c for c in map(chr, range(256)) if not c.isalnum())
 
@@ -28,38 +29,48 @@ class ConceptGraph(object):
     nodeDict = dict()
     labelDict = dict()
 
+    def _cleanString(self, s):
+        r = ""
+        if s == None:
+            return r
+
+        for x in s.lstrip(" "):
+            if x.isalnum() or x in (" ", "-", "."):
+                r = r + x
+        return r.lstrip(" ").rstrip(" ")
+
     def __init__(self):
-        logger.info("ConceptGraph Constructor")
+        logger.info(u"ConceptGraph Constructor")
 
     def isFiltered(self, filterDict, concept):
         if filterDict == None:
             return True
 
         if filterDict.has_key(concept.typeName):
-            logger.debug("Checking Type - " + concept.typeName)
+            logger.debug(u"Checking Type - " + concept.typeName)
             if concept.name in filterDict[concept.typeName]:
-                logger.debug("Keep Node - " + concept.name)
+                logger.debug(u"Keep Node - " + concept.name)
                 return True
             else:
-                logger.debug("Skip Node - " + concept.name)
+                logger.debug(u"Skip Node - " + concept.name)
                 return False
         return True
         
-    def addConcepts(self, concept, filterDict=None, depth=2, n=0):
-        n = n + 1
+    def addConcepts(self, concept, filterDict=None, depth=4, n=0):
+        n += 1
 
         if self.nodeDict.has_key(concept.name):
-            logger.debug("Found Node: " + concept.name)
+            logger.debug(u"Found Node: " + concept.name)
             c = self.nodeDict[concept.name]
         else:
             c = self.addNode(concept)
-            logger.debug("Add Node: " + concept.name + ": " + str(c))
+            logger.debug(u"Add Node: " + concept.name + ": " + str(c))
             self.nodeDict[concept.name] = c
             concept.urn = c
             self.labelDict[concept.typeName] = concept.typeName
 
         if (n > depth):
-            logger.debug("Reached depth["+ str(depth) + "] = " + str(n))
+            logger.debug(u"Reached depth["+ str(depth) + "] = " + str(n))
             return c
 
         pc = concept.getConcepts()
@@ -67,93 +78,105 @@ class ConceptGraph(object):
         for p in pc:
             if self.isFiltered(filterDict, pc[p]):
                 self.addConcepts(pc[p], filterDict, depth, n)
-                logger.debug("Add Edge: " + concept.name + " - " + concept.typeName + " - " + pc[p].name)
-                logger.debug("   Node: " + str(self.nodeDict[concept.name]))
-                logger.debug("   Node: " + str(self.nodeDict[pc[p].name]))
+                logger.debug(u"Add Edge: " + concept.name + " - " + concept.typeName + " - " + pc[p].name)
+                logger.debug(u"   Node: " + str(self.nodeDict[concept.name]))
+                logger.debug(u"   Node: " + str(self.nodeDict[pc[p].name]))
                 self.addEdge(concept, pc[p])
+
         return c
 
     def addConcept(self, concept):
-        #concept.name = concept.name.translate(None, delchars)
+
         if self.nodeDict.has_key(concept.name):
-            logger.debug("Found Node: " + concept.name)
+            logger.debug(u"Found Node: " + concept.name)
             c = self.nodeDict[concept.name]
         else:
             c = self.addNode(concept)
-            logger.debug("Add Node: " + concept.name + ": " + str(c))
+            logger.debug(u"Add Node: " + concept.name + ": " + str(c))
             self.nodeDict[concept.name] = c
             concept.urn = c
             self.labelDict[concept.typeName] = concept.typeName
+
 
 #
 # Neo4JGraph
 #
 class Neo4JGraph(ConceptGraph):
-    db = None
+    graph = None
     gdb = None
-
-    def __init__(self, gdb):
-        self.gdb = gdb
-        self.db = neo4j.GraphDatabaseService(gdb)
-        logger.debug("Neo4j DB @ :" + gdb)
-
-    def clearGraphDB(self):
-        query = neo4j.CypherQuery(self.db, "MATCH (n) DELETE n")
-        query.execute().data
-
-    def query(self, qs):
-        query = neo4j.CypherQuery(self.db, qs)
-        return query.execute().data
+    batches = None
 
     delchars = ''.join(c for c in map(chr, range(255)) if (not c.isalnum()))
+
+    def __init__(self, gdb, batches=False):
+
+        self.graph = neo4j.GraphDatabaseService(gdb)
+        logger.debug(u"Neo4j DB @ :" + gdb)
+
+        self.batches = batches
+
+        if self.batches == True:
+            self.batch = neo4j.WriteBatch(self.graph)
+
+    def clearGraphDB(self):
+        query = neo4j.CypherQuery(self.graph, u"MATCH (n) DELETE n")
+        query.execute().data
+
+    def processBatch(self):
+        if self.batches == True:
+            self.batch.submit()
+
+    def query(self, qs):
+        query = neo4j.CypherQuery(self.graph, qs)
+        return query.execute().data
 
     def setNodeLabels(self):
         for t in self.labelDict:
             typeName = self.labelDict[t].translate(None, self.delchars).strip()
-            qs = "match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
-            logger.debug("Label :" + qs)
+            qs = u"match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
+            logger.debug(u"Label :" + qs)
             query = self.query(qs)
 
-            if typeName.find("Relationship") != -1:
-                qs = "match (n) where (n.typeName=\"%s\") set n:Relation" % (typeName)
-                logger.debug("HyperEdge :" + qs)
+            if typeName.find(u"Relationship") != -1:
+                qs = u"match (n) where (n.typeName=\"%s\") set n:Relation" % (typeName)
+                logger.debug(u"HyperEdge :" + qs)
                 query = self.query(qs)
 
-            elif typeName.find("Business") != -1:
-                qs = "match (n) where (n.typeName=\"%s\") set n:Business" % (typeName)
-                logger.info("HyperEdge :" + qs)
+            elif typeName.find(u"Business") != -1:
+                qs = u"match (n) where (n.typeName=\"%s\") set n:Business" % (typeName)
+                logger.info(u"HyperEdge :" + qs)
                 query = self.query(qs)
 
-            elif typeName.find("Application") != -1:
-                qs = "match (n) where (n.typeName=\"%s\") set n:Application" % (typeName)
-                logger.debug("HyperEdge :" + qs)
+            elif typeName.find(u"Application") != -1:
+                qs = u"match (n) where (n.typeName=\"%s\") set n:Application" % (typeName)
+                logger.debug(u"HyperEdge :" + qs)
                 query = self.query(qs)
 
     def createIndices(self):
         for t in self.labelDict:
             try:
                 typeName = self.labelDict[t].translate(None, self.delchars).strip()
-                qs = "CREATE INDEX ON :%s (name)" % (typeName)
+                qs = u"CREATE INDEX ON :%s (name)" % (typeName)
                 #qs = "match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
-                logger.info("Label :" + qs)
-                query = neo4j.CypherQuery(self.db, qs)
+                logger.info(u"Label :" + qs)
+                query = neo4j.CypherQuery(self.graph, qs)
                 query.execute().data
             except:
                 em = format_exc()
-                logger.warn("Warning: %s" % (em))
+                logger.warn(u"Warning: %s" % (em))
 
     def dropIndices(self):
         for t in self.labelDict:
             try:
                 typeName = self.labelDict[t].translate(None, self.delchars).strip()
-                qs = "DROP INDEX ON :%s (name)" % (typeName)
+                qs = u"DROP INDEX ON :%s (name)" % (typeName)
                 #qs = "match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
-                logger.info("Label :" + qs)
-                query = neo4j.CypherQuery(self.db, qs)
+                logger.info(u"Label :" + qs)
+                query = neo4j.CypherQuery(self.graph, qs)
                 query.execute().data
             except:
                 em = format_exc()
-                logger.warn("Warning: %s" % (em))
+                logger.warn(u"Warning: %s" % (em))
 
     def addNode(self, concept):
 
@@ -161,48 +184,104 @@ class Neo4JGraph(ConceptGraph):
 
         if len(prop) != 0:
             ps = ""
-            for k, v in prop:
-                ps = ps + ", \"%s\":\"%s\""
+            for kk, vv in prop.items():
+                if (vv != None and len(vv) > 0) and (kk != None and len(kk) > 0):
+                    k = self._cleanString(kk)
+                    v = self._cleanString(vv)
 
-            qs = "MERGE (n {name:\"%s\", %s, count:%d, typeName:\"%s\"})" % (concept.name, ps, concept.count, concept.typeName)
+                    logger.debug(u"%s : %s" % (k, v))
+                    ps = ps + u" %s : \"%s\", " % (k, v)
+
+            ps = ps[:-2] # remove the last comma
+
+            logger.debug(u"ps : %s" % ps)
+
+            if len(ps) == 0:
+                qs = u"MERGE (n {name:\"%s\", count:%d, typeName:\"%s\"})" % (concept.name, concept.count, concept.typeName)
+            else:
+                qs = u"MERGE (n {name:\"%s\", %s, count:%d, typeName:\"%s\"})" % (concept.name, ps, concept.count, concept.typeName)
         else:
-            qs = "MERGE (n {name:\"%s\", count:%d, typeName:\"%s\"})" % (concept.name, concept.count, concept.typeName)
+            qs = u"MERGE (n {name:\"%s\", count:%d, typeName:\"%s\"})" % (concept.name, concept.count, concept.typeName)
 
-        logger.debug("Node Query : '%s'" % qs)
+        logger.debug(u"Node Query : '%s'" % qs)
 
-        query = neo4j.CypherQuery(self.db, qs)
-
-        return query.execute().data
-
-        #return self.db.create(node(name=concept.name, count=concept.count, typeName=concept.typeName))
+        if self.batches == True:
+            bqs = qs + " ; "
+            self.batch.append_cypher(bqs)
+        else:
+            query = neo4j.CypherQuery(self.graph, qs)
+            return query.execute().data
         
     def addEdge (self, parentConcept, childConcept, type=None):
+
         if type!=None:
             typeName = type
         else:
             typeName = childConcept.typeName
 
-        qs0 = "match "
-        qs1 = "(n {name : \"%s\", typeName:\"%s\"}), " % (parentConcept.name, parentConcept.typeName)
-        logger.debug("query1 %s" % qs1)
+        qs0 = u"match "
+        qs1 = u"(n {name : \"%s\", typeName:\"%s\"}), " % (parentConcept.name, parentConcept.typeName)
+        logger.debug(u"query1 %s" % qs1)
 
-        qs2 = "(m {name : \"%s\", typeName:\"%s\"}) " % (childConcept.name, childConcept.typeName)
-        logger.debug("query2 %s" % qs2)
+        qs2 = u"(m {name : \"%s\", typeName:\"%s\"}) " % (childConcept.name, childConcept.typeName)
+        logger.debug(u"query2 %s" % qs2)
 
-        qs3 = "merge (n)-[r:%s {typeName:\"%s\"}]->(m)" % (typeName, typeName)
-        logger.debug("query3 %s" % qs3)
+        qs3 = u"merge (n)-[r:%s {typeName:\"%s\"}]->(m)" % (typeName, typeName)
+        logger.debug(u"query3 %s" % qs3)
 
         qs = qs0 + qs1 + qs2 + qs3
 
-        logger.debug("Edge Query %s" % qs)
+        logger.debug(u"Edge Query .%s." % qs)
 
-        query = neo4j.CypherQuery(self.db, qs)
+        if self.batches == True:
+            self.batch.append_cypher(qs)
+        else:
+            query = neo4j.CypherQuery(self.graph, qs)
+            return query.execute().data
 
-        return query.execute().data
+    def processConcepts(self, concepts):
 
-        #return self.db.create(rel(self.nodeDict[childConcept.name][0],
-        #               (typeName, {"count": parentConcept.count}),
-        #               self.nodeDict[parentConcept.name][0]))
+        logger.info(u"Adding %s nodes the graph ..." % type(self.graph))
+        self._addGraphNodes(concepts)
+
+        logger.info(u"Adding %s edges the graph ..." % type(self.graph))
+        self._addGraphEdges(concepts)
+
+    def _addGraphNodes(self, concepts, n=0):
+
+        n += 1
+
+        for c in concepts.getConcepts().values():
+            logger.debug(u"%d : %d Node c : %s:%s" % (n, len(c.getConcepts()), c.name, c.typeName))
+
+            self.addConcept(c)
+
+            self._addGraphNodes(c, n)
+
+    def _addGraphEdges(self, concepts, n=0):
+        n += 1
+
+        self.addConcept(concepts)
+
+        for c in concepts.getConcepts().values():
+
+            logger.debug(u"%d : %d %s c : %s:%s" % (n, len(c.getConcepts()), concepts.name, c.name, c.typeName))
+
+            self.addConcept(c)
+
+            self.addEdge(concepts, c)
+
+            if len(c.getConcepts()) != 0:
+                self._addGraphEdges(c, n)
+
+
+    def Counts(self):
+        qs = u"MATCH (n) RETURN n.typeName, count(n.typeName) order by count(n.typeName) DESC"
+        lq, qd = self.query(qs)
+
+        logger.info(u"Neo4J Counts")
+        for x in sorted(lq[1:], key=lambda c: int(c[2]), reverse=True):
+            logger.info(u"%4d : %s" % (x[2], x[0]))
 #
 # NetworkXGraph
 #
