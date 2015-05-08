@@ -119,7 +119,8 @@ class Neo4JGraph(ConceptGraph):
             self.batch = neo4j.WriteBatch(self.graph)
 
     def clearGraphDB(self):
-        query = neo4j.CypherQuery(self.graph, u"MATCH (n) DELETE n")
+        query = neo4j.CypherQuery(self.graph, u"MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r")
+
         query.execute().data
 
     def processBatch(self, submit=True):
