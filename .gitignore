@@ -14,5 +14,6 @@ nl_lib/test/html/
 nl_lib/test/model.lsi
 nl_lib/test/model.lsi.projection
 nl_lib/test/topicsDict.p
+nl_lib/*.class
 nl_lib/log.txt
 *.txt

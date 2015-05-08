@@ -122,9 +122,12 @@ class Neo4JGraph(ConceptGraph):
         query = neo4j.CypherQuery(self.graph, u"MATCH (n) DELETE n")
         query.execute().data
 
-    def processBatch(self):
+    def processBatch(self, submit=True):
         if self.batches == True:
-            self.batch.submit()
+            if submit == True:
+                self.batch.submit()
+            else:
+                self.batch.submit()
 
     def query(self, qs):
         query = neo4j.CypherQuery(self.graph, qs)
@@ -158,7 +161,7 @@ class Neo4JGraph(ConceptGraph):
                 typeName = self.labelDict[t].translate(None, self.delchars).strip()
                 qs = u"CREATE INDEX ON :%s (name)" % (typeName)
                 #qs = "match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
-                logger.info(u"Label :" + qs)
+                logger.debug(u"Label :" + qs)
                 query = neo4j.CypherQuery(self.graph, qs)
                 query.execute().data
             except:
@@ -171,7 +174,7 @@ class Neo4JGraph(ConceptGraph):
                 typeName = self.labelDict[t].translate(None, self.delchars).strip()
                 qs = u"DROP INDEX ON :%s (name)" % (typeName)
                 #qs = "match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
-                logger.info(u"Label :" + qs)
+                logger.debug(u"Label :" + qs)
                 query = neo4j.CypherQuery(self.graph, qs)
                 query.execute().data
             except:
@@ -435,7 +438,6 @@ class GraphVizGraph(ConceptGraph):
         # Hack to get GraphViz to work
         #
         os.environ[u'PATH'] = u"%s:/opt/local/bin" % os.environ[u'PATH']
-
 
     def addNode(self, n, color="black", shape="box"):
         self.g.add_node(n.name, color=color, shape=shape)

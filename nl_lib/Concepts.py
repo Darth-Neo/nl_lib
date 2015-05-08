@@ -184,16 +184,17 @@ class Concepts(object):
             p.printConcepts(n+1)
 
     def addConceptKeyType(self, keyConcept, typeConcept):
+
         k = self.cleanString(keyConcept)
         t = self.cleanString(typeConcept)
-        
+
+        self.incCount()
+
         if self.cd.has_key(k):
             c = self.cd[k]
-            c.incCount()
             logger.debug("Found:     %s\tCount:%s" % (k, c.count))
         else:
             c = Concepts(k, t)
-            c.incCount()
             self.cd[k] = c
             logger.debug("Not found: %s->%s" % (k, t))
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Concept Class for NLP
+# Logging for nl_lib
 #
 __VERSION__ = 0.1
 __author__ = 'morrj140'
@@ -33,13 +33,6 @@ def setupLogging(name):
     fileHandler.setFormatter(logFormatter)
     logger.addHandler(fileHandler)
 
-    #hdlr = logging.FileHandler(logFile)
-    #hdlr.setFormatter(logFormatter)
-    #logger.addHandler(hdlr)
-
-    ## Reset Logfile
-    #with open(logFile, 'w'):
-    #    pass
-    
     return logger
+
 
