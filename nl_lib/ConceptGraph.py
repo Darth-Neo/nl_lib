@@ -25,8 +25,6 @@ logger.setLevel(INFO)
 #
 os.environ[u'PATH'] = u"%s:/opt/local/bin" % os.environ[u'PATH']
 
-# delchars = ''.join(c for c in map(chr, range(256)) if not c.isalnum())
-
 #
 # Base Class - ConceptGraph to export Concepts into Graph
 #
@@ -117,8 +115,6 @@ class Neo4JGraph(ConceptGraph):
     gdb = None
     batches = None
 
-    delchars = ''.join(c for c in map(chr, range(255)) if (not c.isalnum()))
-
     def __init__(self, gdb, batches=False):
 
         self.graph = neo4j.GraphDatabaseService(gdb)
@@ -147,7 +143,7 @@ class Neo4JGraph(ConceptGraph):
 
     def setNodeLabels(self):
         for t in self.labelDict:
-            typeName = self.labelDict[t].translate(None, self.delchars).strip()
+            typeName = unicode(self.labelDict[t]).strip()
             qs = u"match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
             logger.debug(u"Label :" + qs)
             self.query(qs)
@@ -170,7 +166,7 @@ class Neo4JGraph(ConceptGraph):
     def createIndices(self):
         for t in self.labelDict:
             try:
-                typeName = self.labelDict[t].translate(None, self.delchars).strip()
+                typeName = unicode(self.labelDict[t]).strip()
                 qs = u"CREATE INDEX ON :%s (name)" % typeName
 
                 logger.debug(u"Label :" + qs)
@@ -183,7 +179,7 @@ class Neo4JGraph(ConceptGraph):
     def dropIndices(self):
         for t in self.labelDict:
             try:
-                typeName = self.labelDict[t].translate(None, self.delchars).strip()
+                typeName = unicode(self.labelDict[t]).strip()
                 qs = u"DROP INDEX ON :%s (name)" % (typeName)
 
                 logger.debug(u"Label :" + qs)
@@ -201,8 +197,8 @@ class Neo4JGraph(ConceptGraph):
             ps = u""
             for kk, vv in prop.items():
                 if (vv is not None and len(vv) > 0) and (kk is not None and len(kk) > 0):
-                    k = unicode(kk)  # self._cleanString(kk)
-                    v = unicode(vv)  # self._cleanString(vv)
+                    k = unicode(kk)
+                    v = unicode(vv)
 
                     logger.debug(u"%s : %s" % (k, v))
                     ps = u"%s %s : \"%s\", " % (ps, k, v)

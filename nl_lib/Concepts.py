@@ -25,8 +25,6 @@ class Concepts(object):
     cd = None
     conceptFile = None
     properties = None
-    
-    # delchars = u''.join(c for c in map(chr, range(255)) if (not c.isalnum() and c != ' '))
 
     def __init__(self, name=None, typeName=None):
         self.name = unicode(name)
@@ -61,24 +59,9 @@ class Concepts(object):
     def getProperties(self):
         return self.properties
 
-    def _cleanString(self, name):
-        '''
-        :param name: name
-        :return: string
-        Note: Encode a string to UTF-8
-        Note: Decode a string to Unicode
-        '''
-        try:
-            if isinstance(name, (str, unicode)):
-                return name.encode(u'utf-8', errors=u'ignore')
-            else:
-                n = name.translate(None, self.delchars).strip()
-            u = unicode(n, u"utf-8", errors=u'ignore')
-            return u.encode(u"utf-8", errors=u"ignore")
-        except:
-            return u" "
-
     def dictChildrenType(self, typeName, n=4, conceptFilter=None):
+
+        typeName = unicode(typeName)
         logger.debug(u"dictChildrenType %s" % typeName)
         if n < 1:
             return None
@@ -90,7 +73,7 @@ class Concepts(object):
 
         for p in pc.values():
             if p.typeName == typeName:
-                if not conceptFilter.has_key(p.name):
+                if p.name not in conceptFilter:
                     conceptFilter[p.name] = p
 
             p.dictChildrenType(typeName, n-1, conceptFilter)
@@ -188,8 +171,8 @@ class Concepts(object):
 
     def addConceptKeyType(self, keyConcept, typeConcept):
 
-        k = unicode(keyConcept)  # self.cleanString(keyConcept)
-        t = unicode(typeConcept)  # self.cleanString(typeConcept)
+        k = unicode(keyConcept)
+        t = unicode(typeConcept)
 
         self.incCount()
 
@@ -238,40 +221,6 @@ class Concepts(object):
             logger.error(str(sys.exc_info()[0]))
             
         return concepts
-
-    @staticmethod
-    def _decode_utf8(v, encoding=u"utf-8"):
-        """ Returns the given value as a Unicode string (if possible).
-        """
-        try:
-            if isinstance(encoding, basestring):
-                encoding = ((encoding, u"ignore"),) + ((u"windows-1252",), (u"utf-8", u"ignore"))
-            if isinstance(v, str):
-                for e in encoding:
-                    try: return v.decode(*e)
-                    except:
-                        logger.error(str(sys.exc_info()[0]))
-                return v
-            return unicode(v)
-        except:
-            return u" "
-        
-    @staticmethod
-    def _encode_utf8(v, encoding=u"utf-8"):
-        """ Returns the given value as a Python byte string (if possible).
-        """
-        try:
-            if isinstance(encoding, basestring):
-                encoding = ((encoding, u"ignore"),) + ((u"windows-1252",), (u"utf-8", u"ignore"))
-            if isinstance(v, unicode):
-                for e in encoding:
-                    try: return v.encode(*e)
-                    except:
-                        logger.error(str(sys.exc_info()[0]))
-                return v
-            return str(v)
-        except:
-            return " "
 
     @staticmethod
     def _lineCSV(concepts, cstr=None, n=0):

@@ -11,9 +11,11 @@ import sys
 from gensim import corpora, models, similarities
 from gensim.models import lsimodel
 
-from nl_lib import Logger, Concepts, Tokens
-logger = Logger.setupLogging(__name__)
+from nl_lib.Logger import *
+logger = setupLogging(__name__)
+logger.setLevel(INFO)
 
+from nl_lib.Concepts import Concepts
 #
 # TopicModel to analyze topic concepts via Gensim
 #
@@ -36,8 +38,6 @@ class TopicsModel(object):
     # Compute similarity between documents / projects
     similarityThreshold = 0.95
 
-    # delchars = ''.join(c for c in map(chr, range(255)) if (not c.isalnum() and c != ' '))
-
     def __init__(self, directory=None, st=None):
 
         if directory is None:
@@ -58,24 +58,24 @@ class TopicsModel(object):
     #        yield dictionary.doc2bow(line.lower().split())
 
     def saveTopics(self, topics):
-        wordConcepts = Concepts.Concepts(u"TopicConcepts", u"Topics")
+        wordConcepts = Concepts(u"TopicConcepts", u"Topics")
         for topic in topics:
             logger.debug(u"Topic:" + topic[0])
             w = wordConcepts.addConceptKeyType(topic[0], u"Topic")
             w.count = topic[1]
-        Concepts.Concepts.saveConcepts(wordConcepts, self.topicsFile)
+        Concepts.saveConcepts(wordConcepts, self.topicsFile)
         return wordConcepts
 
     def saveDictionary(self):
-        if (self.dictionary is not None) :
+        if (self.dictionary is not None):
             self.dictionary.save(self.dictFile)
 
     def loadDictionary(self):
-        if (os.path.isfile(self.dictFile)) :
+        if (os.path.isfile(self.dictFile)):
             return corpora.Dictionary.load(self.dictFile)
 
     def saveCorpus(self):
-        if (self.corpus is not None) :
+        if (self.corpus is not None):
             corpora.MmCorpus.serialize(self.corpusFile, self.corpus)
 
     def loadCorpus(self):

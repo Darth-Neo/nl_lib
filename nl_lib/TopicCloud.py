@@ -22,6 +22,8 @@ from wordcloud import WordCloud, STOPWORDS
 #
 # TopicCloud to create a Tag Cloud for Concepts
 #
+
+
 class TopicCloud(object):
     topicsConcepts = None
     homeDir = None
@@ -57,9 +59,9 @@ class TopicCloud(object):
             return None
 
         for p in concepts.getConcepts().values():
-            if p.typeName == typeName:
-                if dictConcepts.has_key(p.name):
-                    dictConcepts[p.name] = dictConcepts[p.name] + 1
+            if p.typeName == unicode(typeName):
+                if p.name in dictConcepts:
+                    dictConcepts[p.name] += 1
                 else:
                     w = self.getLemma(p.name)
                     if p.count == 0:
@@ -78,8 +80,8 @@ class TopicCloud(object):
         sn = u""
 
         for x in name.split(u" "):
-            lemmaWord = self.lemmatizer.lemmatize(x.lower())
-            sn = sn + u" " + lemmaWord
+            lemmaWord = unicode(self.lemmatizer.lemmatize(x.lower()))
+            sn = u"%s %s" % (sn, lemmaWord)
 
         logger.debug(u"New Lemma : %s" % sn)
 
@@ -95,7 +97,7 @@ class TopicCloud(object):
             return None
 
         for d in dictConcepts.keys():
-            dictConcepts[d] = dictConcepts[d] + dictConcepts[d] * scale
+            dictConcepts[d] += (dictConcepts[d] * scale)
 
         e = sorted(dictConcepts.iteritems(), key=itemgetter(1), reverse=True)[:numWords]
         logger.debug(u"e = %s" % e)
