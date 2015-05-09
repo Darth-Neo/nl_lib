@@ -312,7 +312,7 @@ class NetworkXGraph(ConceptGraph):
             filename = gmlFile
 
         self.filename = filename
-        logger.debug(u"GML saved to :" + self.filename)
+        logger.debug(u"GML saved to : %s" % unicode(self.filename))
 
     def clearGraphDB(self):
         self.G = nx.Graph()
@@ -320,8 +320,11 @@ class NetworkXGraph(ConceptGraph):
     def saveGraph(self, filename=None):
         if filename is None:
             filename = os.getcwd() + os.sep + gmlFile
+
         dbg = unicode(self.G.nodes(data=True))
+
         logger.debug(u"%s" % dbg)
+
         nx.write_gml(self.G, filename)
 
     def addNode(self, concept):
