@@ -10,52 +10,52 @@ import os
 # Common Filenames
 homeDir = os.getcwd() + os.sep
 
-projectsFile   = homeDir + "projectsDict.p"
-peopleFile     = homeDir + "peopleDict.p"
-peopleFile     = homeDir + "peopleDict.p"
-wordsFile      = homeDir + "wordsDict.p"
-topicsFile     = homeDir + "topicsDict.p"
-sentencesFile  = homeDir + "sentencesDict.p"
-similarityFile = homeDir + "similarityDict.p" 
-imageFile      = homeDir + "Topics_Cloud.bmp"
-gmlFile        = homeDir + "Concepts.gml"
-logFile        = homeDir + "nl_phase_log.txt"
+projectsFile   = homeDir + u"projectsDict.p"
+peopleFile     = homeDir + u"peopleDict.p"
+peopleFile     = homeDir + u"peopleDict.p"
+wordsFile      = homeDir + u"wordsDict.p"
+topicsFile     = homeDir + u"topicsDict.p"
+sentencesFile  = homeDir + u"sentencesDict.p"
+similarityFile = homeDir + u"similarityDict.p"
+imageFile      = homeDir + u"Topics_Cloud.bmp"
+gmlFile        = homeDir + u"Concepts.gml"
+logFile        = homeDir + u"nl_phase_log.txt"
 
 # Used to add words to the stoplist
 from nltk.corpus import stopwords
-stop = stopwords.words('english')
+stop = stopwords.words(u'english')
 
 # Add Stopwords
-stop.append("of")
-stop.append("the")
-stop.append("not")
-stop.append("to")
-stop.append("or")
-stop.append("this")
-stop.append("all")
-stop.append("on")
-stop.append("with")
-stop.append("we")
-stop.append("in")
-stop.append("This")
-stop.append("The")
-stop.append(",")
-stop.append(".")
-stop.append("..")
-stop.append("...")
-stop.append("...).")
-stop.append("\")..")
-stop.append(".")
-stop.append(";")
-stop.append("/")
-stop.append(")")
-stop.append("(")
-stop.append("must")
-stop.append("system")
-stop.append("This")
-stop.append("The")
-stop.append(",")
-stop.append("must")
-stop.append("and")
-stop.append("of")
-stop.append("by")
+stop.append(u"of")
+stop.append(u"the")
+stop.append(u"not")
+stop.append(u"to")
+stop.append(u"or")
+stop.append(u"this")
+stop.append(u"all")
+stop.append(u"on")
+stop.append(u"with")
+stop.append(u"we")
+stop.append(u"in")
+stop.append(u"This")
+stop.append(u"The")
+stop.append(u",")
+stop.append(u".")
+stop.append(u"..")
+stop.append(u"...")
+stop.append(u"...).")
+stop.append(u"\")..")
+stop.append(u".")
+stop.append(u";")
+stop.append(u"/")
+stop.append(u")")
+stop.append(u"(")
+stop.append(u"must")
+stop.append(u"system")
+stop.append(u"This")
+stop.append(u"The")
+stop.append(u",")
+stop.append(u"must")
+stop.append(u"and")
+stop.append(u"of")
+stop.append(u"by")

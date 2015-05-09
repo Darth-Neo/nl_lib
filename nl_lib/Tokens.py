@@ -22,19 +22,20 @@ from pattern.en import Sentence
 from nl_lib import Logger, Concepts
 logger = Logger.setupLogging(__name__)
 
+
 def sentenceTokensPattern (sentence, projectsConcepts, wordsConcepts):
-    stop.append("The")
-    stop.append("This")
-    stop.append("We")
-    stop.append("Currently")
+    stop.append(u"The")
+    stop.append(u"This")
+    stop.append(u"We")
+    stop.append(u"Currently")
     cleanSentence = ' '.join([word for word in sentence.split() if word not in stop])
   
     pt = parsetree(cleanSentence, relations=True, lemmata=True)
 
-    logger.debug("s: .%s." % pt)
+    logger.debug(u"s: .%s." % pt)
     
     for sentence in pt:
-        logger.debug("sentence: .%s." % sentence)
+        logger.debug(u"sentence: .%s." % sentence)
 
         try:
             if len(sentences.subjects) > 0:
@@ -42,67 +43,69 @@ def sentenceTokensPattern (sentence, projectsConcepts, wordsConcepts):
                 verb = sentence.verbs[0]
                 predicate = sentence.objects[0]
 
-                logger.info("%s.%s(%s)" % (subject, verb, predicate))
+                logger.info(u"%s.%s(%s)" % (subject, verb, predicate))
 
                 # Add concept to words
                 w = wordsConcepts.addConceptKeyType(subject, verb)
-                w.addConceptKeyType(projectsConcepts.name, "Project")
+                w.addConceptKeyType(projectsConcepts.name, u"Project")
             else:
                 addChunks(sentence, projectsConcepts, wordsConcepts)
         except:
             pass
 
+
 def sentenceTokensNLTK (sentence, projectsConcepts, wordsConcepts):
-    logger.debug("Sentence: " + sentence)
+    logger.debug(u"Sentence: " + sentence)
         
     for word, pos in nltk.pos_tag(nltk.wordpunct_tokenize(sentence)):
-        logger.debug("Word: " + word + " POS: " + pos)
+        logger.debug(u"Word: " + word + u" POS: " + pos)
 
-        if pos == "NNS":
+        if pos == u"NNS":
             # Add word concept to project
-            w = projectsConcepts.addConceptKeyType(word, "Word")
-            w.addConceptKeyType(pos, "POS")
+            w = projectsConcepts.addConceptKeyType(word, u"Word")
+            w.addConceptKeyType(pos, u"POS")
 
             # Add concept to words
-            w = wordsConcepts.addConceptKeyType(word, "Word")
-            w.addConceptKeyType(pos, "POS")
+            w = wordsConcepts.addConceptKeyType(word, u"Word")
+            w.addConceptKeyType(pos, u"POS")
 
-            #syns = wn.synsets(word)
-            #for s in syns:
-                #logger.debug("definition:" + s.definition)
+            # syns = wn.synsets(word)
+            # for s in syns:
+                # logger.debug("definition:" + s.definition)
 
-                #logger.debug("examples:")
-                #for b in s.examples:
-                #    logger.debug(b)
+                # logger.debug("examples:")
+                # for b in s.examples:
+                #     logger.debug(b)
                 
-                #for l in s.lemmas:
-                #    logger.debug("Synonym: " + l.name)
-                #    wl = wordConcepts.addConcept(l.name, "Synonym")
+                # for l in s.lemmas:
+                #     logger.debug("Synonym: " + l.name)
+                #     wl = wordConcepts.addConcept(l.name, "Synonym")
+
 
 def sentenceTokensPatternChunks(sentence, projectsConcepts, wordsConcepts):
     sent = Sentence(parse(sentence))
     for chunk in sent.chunks:
         wordChunk = chunk.string
 
-        if chunk.type == "NP":
-            logger.debug("NP: .%s." % (wordChunk))
+        if chunk.type == u"NP":
+            logger.debug(u"NP: .%s." % (wordChunk))
             
             # Add word concept to project
-            d = projectsConcepts.addConceptKeyType("Descriptions", "Words")
-            w = d.addConceptKeyType(wordChunk, "Word")
-            p = w.addConceptKeyType(chunk.type, "POS")
+            d = projectsConcepts.addConceptKeyType(u"Descriptions", u"Words")
+            w = d.addConceptKeyType(wordChunk, u"Word")
+            p = w.addConceptKeyType(chunk.type, u"POS")
 
             # Add concept to words
-            w = wordsConcepts.addConceptKeyType(wordChunk, "Word")
-            w.addConceptKeyType(chunk.type, "POS")
-            w.addConceptKeyType(projectsConcepts.name, "Project")
+            w = wordsConcepts.addConceptKeyType(wordChunk, u"Word")
+            w.addConceptKeyType(chunk.type, u"POS")
+            w.addConceptKeyType(projectsConcepts.name, u"Project")
 
 def synsetsWordNet(word):
     s = wordnet.synsets(word)[0]
 
-    logger.info("Definition: %s" % s.gloss)
-    logger.info(" Synonyms : %s" % s.synonyms)
-    logger.info(" Hypernyms: %s" % s.hypernyms())
-    logger.info(" Hyponyms : %s" % s.hyponyms())
-    logger.info(" Holonyms : %s" % s.holonyms())
-    logger.info(" Meronyms : %s" % s.meronyms())
+    logger.info(u"Definition: %s" % s.gloss)
+    logger.info(u" Synonyms : %s" % s.synonyms)
+    logger.info(u" Hypernyms: %s" % s.hypernyms())
+    logger.info(u" Hyponyms : %s" % s.hyponyms())
+    logger.info(u" Holonyms : %s" % s.holonyms())
+    logger.info(u" Meronyms : %s" % s.meronyms())

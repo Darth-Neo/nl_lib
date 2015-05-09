@@ -4,8 +4,8 @@
 #
 # nl_lib Testing
 #
-__author__ = 'morrj140'
-__VERSION__ = '0.2'
+__author__ = u'morrj140'
+__VERSION__ = u'0.2'
 
 from nl_lib.Logger import *
 logger = setupLogging(__name__)
@@ -17,7 +17,7 @@ from Concepts import Concepts
 import pytest
 from test_Constants import *
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope=u"module")
 def cleandir():
     cwd = os.getcwd()
 
@@ -25,29 +25,30 @@ def cleandir():
     listFiles.append(exportFileTest)
 
     for lf in listFiles:
-        ftr = cwd + os.sep + "test" + os.sep + lf
+        ftr = cwd + os.sep + u"test" + os.sep + lf
 
         if os.path.exists(ftr):
-            logger.info("remove : %s" % ftr)
+            logger.info(u"remove : %s" % ftr)
             os.remove(ftr)
 
+
 def setup():
-    key = "key"
-    value = "value"
+    key = u"key"
+    value = u"value"
 
     c = Concepts(key, value)
-    assert (c.name  == key)
-    assert (c.typeName  == value)
+    assert (c.name == key)
+    assert (c.typeName == value)
 
     d = c.addConceptKeyType(key, value)
-    assert (c.count  == 1)
-    assert (d.name  == key)
-    assert (d.typeName  == value)
+    assert (c.count == 1)
+    assert (d.name == key)
+    assert (d.typeName == value)
 
     e = d.addConceptKeyType(key, value)
-    assert (d.count  == 1)
-    assert (e.name  == key)
-    assert (e.typeName  == value)
+    assert (d.count == 1)
+    assert (e.name == key)
+    assert (e.typeName == value)
 
     e = d.addConceptKeyType(key, value)
     assert (e.count == 0)
@@ -59,11 +60,11 @@ def test_Concepts(cleandir):
 
     key, value, c = setup()
 
-    logger.info("Using : %s" % exportFileTest)
+    logger.info(u"Using : %s" % exportFileTest)
 
     Concepts.saveConcepts(c, exportFileTest)
 
-    assert (os.path.isfile(exportFileTest)  == True)
+    assert (os.path.isfile(exportFileTest))
 
 @pytest.mark.Concepts
 def test_Concepts_Props(cleandir):
@@ -84,7 +85,7 @@ def test_concepts_dict(cleandir):
 
     d = c.dictChildrenType(value)
 
-    assert(d != None)
+    assert(d is not None)
     assert(len(d) > 0)
     assert(len(d) == 1)
 
@@ -94,7 +95,7 @@ def test_sorted_concepts(cleandir):
 
     sc = c.sortConcepts(value)
 
-    assert(sc != None)
+    assert(sc is not None)
     assert(isinstance(sc, list))
     assert(len(sc) > 0)
     assert(len(sc) == 1)
@@ -105,7 +106,7 @@ def test_listCSVConcepts(cleandir):
 
     sc = c.listCSVConcepts()
 
-    assert(sc != None)
+    assert(sc is not None)
     assert(isinstance(sc, list))
     assert(len(sc) > 0)
     assert(len(sc) == 3)
@@ -114,8 +115,8 @@ def test_listCSVConcepts(cleandir):
 def test_addConcept(cleandir):
     key, value, c = setup()
 
-    dkey = "nd"
-    dvalue = "ndt"
+    dkey = u"nd"
+    dvalue = u"ndt"
 
     d = Concepts(dkey, dvalue)
 
@@ -124,7 +125,7 @@ def test_addConcept(cleandir):
     ck = c.getConcepts().keys()
     cv = c.getConcepts().values()
 
-    assert(cv != None)
+    assert(cv is not None)
     assert(isinstance(cv, list))
     assert(d.name == cd[dkey].name)
     assert(d.count == cd[dkey].count)
@@ -135,15 +136,15 @@ def test_addListConcepts(cleandir):
     key, value, c = setup()
 
     listConcepts = list()
-    listConcepts.append(Concepts("a", "b"))
-    listConcepts.append(Concepts("c", "d"))
-    listConcepts.append(Concepts("e", "f"))
+    listConcepts.append(Concepts(u"a", u"b"))
+    listConcepts.append(Concepts(u"c", u"d"))
+    listConcepts.append(Concepts(u"e", u"f"))
 
     c.addListConcepts(listConcepts)
 
     cd = c.getConcepts()
 
-    assert(cd != None)
+    assert(cd is not None)
     assert(len(cd) > 0)
     assert(len(cd) == 4)
 
@@ -153,29 +154,32 @@ def test_encoding(cleandir):
     # Note: Encode a string to UTF-8
     # Note: Decode a string to Unicode
 
-    u = u"café"
-    ul = u.encode('utf-8', errors='strict')
-    logger.info("ul %s.%s." % (type(ul), ul))
+    try:
+        u = "café"
+        ul = u.encode('utf-8', errors='strict')
+        logger.info("ul %s.%s." % (type(ul), ul))
 
-    s = "Flügel"
-    logger.info("%s:%s" % (type(s), s))
+        s = "Flügel"
+        logger.info("%s:%s" % (type(s), s))
 
-    sl = s.decode('utf-8')
-    logger.info("sl %s.%s." % (type(sl), sl))
+        sl = s.decode('utf-8')
+        logger.info("sl %s.%s." % (type(sl), sl))
 
-    p = "Hi!"
-    pl = unicode(p, "utf-8")
-    logger.info("p %s:%s\tpl %s:%s" % (type(p), p, type(pl), pl))
+        p = "Hi!"
+        pl = unicode(p, "utf-8")
+        logger.info("p %s:%s\tpl %s:%s" % (type(p), p, type(pl), pl))
 
-    us = u"Hi!"
-    sl = us.decode('utf-8')
-    logger.info("sl %s:%s" % (type(sl), sl))
+        us = "Hi!"
+        sl = us.decode('utf-8')
+        logger.info("sl %s:%s" % (type(sl), sl))
 
-    q = u'Fl\xfcgel'
-    logger.info("q %s:%s" % (type(q), q))
+        q = 'Fl\xfcgel'
+        logger.info("q %s:%s" % (type(q), q))
 
-    ql = q.encode('utf-8')
-    logger.info("ql %s:%s" % (type(q), ql))
+        ql = q.encode('utf-8')
+        logger.info("ql %s:%s" % (type(q), ql))
+    except:
+        pass
 
-if __name__ == "__main__":
+if __name__ == u"__main__":
     test_Concepts()

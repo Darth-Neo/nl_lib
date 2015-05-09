@@ -3,7 +3,7 @@
 # Concept Class for NLP
 #
 __VERSION__ = 0.1
-__author__ = 'morrj140'
+__author__ = u'morrj140'
 
 import sys
 import os
@@ -12,25 +12,22 @@ import Logger
 logger = Logger.setupLogging(__name__)
     
 from PatternSearch import PatternSearch
-from Proxies import Proxies
 
-#
-# main
-#
+
 def crawlSearch(searchTerm):      
 
-    #proxies = Proxies()
-    #proxy = proxies.randomProxyHandler()
+    # proxies = Proxies()
+    # proxy = proxies.randomProxyHandler()
 
-    if searchTerm == None:
+    if searchTerm is None:
         return
 
-    logger.info("Searching for '%s'" % searchTerm)
+    logger.info(u"Searching for '%s'" % searchTerm)
 
-    if os.name == "nt":
-        homeDir = "crawlSearch_" + time.strftime("%Y%d%m_%H%M%S")
+    if os.name == u"nt":
+        homeDir = u"crawlSearch_" + time.strftime(u"%Y%d%m_%H%M%S")
     else:
-        homeDir = homeDir="/srv/www/htdocs"
+        homeDir = homeDir = u"/srv/www/htdocs"
     
     pc = PatternSearch(searchTerm, False, homeDir)  
     urlConcepts, wordConcepts = pc.patternSearch(12, 100)
@@ -39,10 +36,10 @@ def crawlSearch(searchTerm):
     
     pc.savePatternConcepts()
 
-    #concept.logConcepts()
-    #wordConcepts.logConcepts()
+    #  concept.logConcepts()
+    #  wordConcepts.logConcepts()
     
     
-if __name__ == '__main__':
-    searchTerm = "Walt Disney World Vacations"
+if __name__ == u'__main__':
+    searchTerm = u"Walt Disney World Vacations"
     crawlSearch(searchTerm)

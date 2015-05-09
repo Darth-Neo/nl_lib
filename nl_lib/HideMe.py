@@ -16,7 +16,7 @@ import re
 import urllib
 
 #Globals
-page = 'https://hidemyass.com/proxy-list/search-225734'
+page = u'https://hidemyass.com/proxy-list/search-225734'
 pass1 = re.compile("\&lt;td\&gt;\&lt;span\&gt;.*\..*\..*\..*\&lt;/span\&gt;\&lt;/td\&gt;\t\n.*\&lt;td\&gt;\n.*")
 pass2 = re.compile("\d+")
 

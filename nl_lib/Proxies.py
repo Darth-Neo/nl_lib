@@ -3,7 +3,7 @@
 # Concept Class for NLP
 #
 __VERSION__ = 0.1
-__author__ = 'morrj140'
+__author__ = u'morrj140'
 
 import sys
 import os
@@ -18,45 +18,45 @@ class Proxies(object):
     proxyFile = None
     proxyList = None
     
-    def __init__(self, proxyFile='./proxies.csv'):
+    def __init__(self, proxyFile=u'./proxies.csv'):
         self.proxyFile = proxyFile
         self.proxyList = list()
         
-        with open(self.proxyFile, 'rb') as csvfile:
+        with open(self.proxyFile, u'rb') as csvfile:
             # Skip first line
             csvfile.readline()
-            siteRow = csv.reader(csvfile, delimiter=',', quotechar='"')
+            siteRow = csv.reader(csvfile, delimiter=u',', quotechar=u'"')
             n = 0
             for row in siteRow:
                 n += 1
-                logger.debug("%d - %s" % (n, row))
+                logger.debug(u"%d - %s" % (n, row))
                 m = 0
                 plist = list()
                 for col in row:
                     m += 1
                     if m in (2, 3):
-                        logger.debug("   %d - %s" % (m, col))
+                        logger.debug(u"   %d - %s" % (m, col))
                         plist.append(col)
                 self.proxyList.append(plist)
         
-        logger.debug("%s" % self.proxyList)
+        logger.debug(u"%s" % self.proxyList)
         
     def randomProxyHandler(self):
-        logger.debug("%s" % self.proxyList)
+        logger.debugu(u"%s" % self.proxyList)
         
-        proxyIndex = randint(0,len(self.proxyList)-1) 
+        proxyIndex = randint(0, len(self.proxyList)-1)
         
         proxy = self.proxyList[proxyIndex]
         
-        p = 'http://' + proxy[0] + ':' + proxy[1]
-        logger.info("Use Random Proxy %s" % (p))
+        p = u'http://' + proxy[0] + ':' + proxy[1]
+        logger.info(u"Use Random Proxy %s" % (p))
         
-        proxy_support = urllib2.ProxyHandler({"http" : p})
+        proxy_support = urllib2.ProxyHandler({u"http" : p})
         opener = urllib2.build_opener(proxy_support)
         urllib2.install_opener(opener)
 
-        return urllib2.ProxyHandler({"http" : p})
+        return urllib2.ProxyHandler({u"http" : p})
         
-if __name__ == '__main__':   
+if __name__ == u'__main__':
     proxy = Proxies().randomProxyHandler()
-    
+

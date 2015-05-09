@@ -14,6 +14,7 @@ from nl_lib.Concepts import Concepts
 import pytest
 from test_Constants import *
 
+
 @pytest.fixture(scope=u"module")
 def cleandir():
     cwd = os.getcwd()
@@ -24,6 +25,7 @@ def cleandir():
         if os.path.exists(ftr):
             logger.info(u"remove : %s" % ftr)
             os.remove(ftr)
+
 
 @pytest.mark.TopicsMode
 def test_CreateTopicCloud(cleandir):
@@ -38,7 +40,7 @@ def test_CreateTopicCloud(cleandir):
         logger.info(u"remove : %s" % imageFile)
         os.remove(imageFile)
 
-    assert (os.path.isfile(imageFile) == False)
+    assert (os.path.isfile(imageFile) is False)
 
     concepts = Concepts.loadConcepts(conceptFile)
 
@@ -46,7 +48,7 @@ def test_CreateTopicCloud(cleandir):
 
     tc.createTagCloud(topic)
 
-    assert (os.path.isfile(imageFile)  == True)
+    assert (os.path.isfile(imageFile) is True)
 
 if __name__ == u"__main__":
     test_CreateTopicCloud(cleandir)

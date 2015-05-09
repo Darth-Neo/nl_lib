@@ -3,7 +3,7 @@
 # Concept Class for NLP
 #
 __VERSION__ = 0.1
-__author__ = 'morrj140'
+__author__ = u'morrj140'
 
 import os
 import sys
@@ -25,25 +25,25 @@ class TopicsModel(object):
     indexFile      = None
     documentTopics = None
 
-    dictFilename   = "Dictionary.dict"
-    corpusFilename = "corpus.mm"
-    lsiFilename    = "model.lsi"
-    indexFilename  = "topic.index"
-    topicsFileneme = "topicsDict.p"
+    dictFilename   = u"Dictionary.dict"
+    corpusFilename = u"corpus.mm"
+    lsiFilename    = u"model.lsi"
+    indexFilename  = u"topic.index"
+    topicsFileneme = u"topicsDict.p"
 
     texts = None
 
     # Compute similarity between documents / projects
     similarityThreshold = 0.95
 
-    delchars = ''.join(c for c in map(chr, range(255)) if (not c.isalnum() and c != ' '))
+    # delchars = ''.join(c for c in map(chr, range(255)) if (not c.isalnum() and c != ' '))
 
     def __init__(self, directory=None, st=None):
 
-        if directory == None:
+        if directory is None:
             directory = os.getcwd() + os.sep
 
-        if st != None:
+        if st is not None:
             self.similarityThreshold = st
             
         self.corpusFile = directory + self.corpusFilename
@@ -52,22 +52,22 @@ class TopicsModel(object):
         self.dictFile  = directory + self.dictFilename
         self.topicsFile  = directory + self.topicsFileneme
 
-    #def __iter__(self):
+    # def __iter__(self):
     #    for line in open('mycorpus.txt'):
     #        # assume there's one document per line, tokens separated by whitespace
     #        yield dictionary.doc2bow(line.lower().split())
 
     def saveTopics(self, topics):
-        wordConcepts = Concepts.Concepts("TopicConcepts", "Topics")
+        wordConcepts = Concepts.Concepts(u"TopicConcepts", u"Topics")
         for topic in topics:
-            logger.debug("Topic:" + topic[0])
-            w = wordConcepts.addConceptKeyType(topic[0], "Topic")
+            logger.debug(u"Topic:" + topic[0])
+            w = wordConcepts.addConceptKeyType(topic[0], u"Topic")
             w.count = topic[1]
         Concepts.Concepts.saveConcepts(wordConcepts, self.topicsFile)
         return wordConcepts
 
     def saveDictionary(self):
-        if (self.dictionary != None) :
+        if (self.dictionary is not None) :
             self.dictionary.save(self.dictFile)
 
     def loadDictionary(self):
@@ -75,7 +75,7 @@ class TopicsModel(object):
             return corpora.Dictionary.load(self.dictFile)
 
     def saveCorpus(self):
-        if (self.corpus != None) :
+        if (self.corpus is not None) :
             corpora.MmCorpus.serialize(self.corpusFile, self.corpus)
 
     def loadCorpus(self):
@@ -92,16 +92,16 @@ class TopicsModel(object):
 
     def logTexts(self, texts):
         for text in texts:
-           logger.info("Text[" + str(texts.index(text)) + "] :  " + text)
+            logger.info(u"Text[" + str(texts.index(text)) + u"] :  " + text)
 
     def logTopics(self, topics):
 
-        if topics == None or len(topics) == 0:
-            logger.error("Nothing to log!")
+        if topics is None or len(topics) == 0:
+            logger.error(u"Nothing to log!")
             return None
         l = sorted(topics, key=lambda c: abs(c[1]), reverse=True)
         for topic in l:
-            logger.info("Topic[" + str(topic[0]) + "]=" + str(topic[1]))
+            logger.info(u"Topic[" + str(topic[0]) + u"]=" + str(topic[1]))
 
     @staticmethod
     def convertMetric(metric):
@@ -112,8 +112,8 @@ class TopicsModel(object):
     def computeTopics(self, texts, nt=50, nw=5):
         self.texts = texts
 
-        if texts == None or len(texts) == 0:
-            logger.error("No texts to use!")
+        if texts is None or len(texts) == 0:
+            logger.error(u"No texts to use!")
             return None
 
         # test set
@@ -122,23 +122,23 @@ class TopicsModel(object):
         # training set
         self.corpus = [self.dictionary.doc2bow(text) for text in texts]
 
-        #logger.info("corpus ready")
-        #for c1 in self.corpus:
+        # logger.info("corpus ready")
+        # for c1 in self.corpus:
         #    for c2 in c1:
         #       logger.info("word: %s  count:%s  index:%s" % (self.dictionary[c2[0]], c2[1], c2[0]))
 
         tfidf = models.TfidfModel(self.corpus)
-        logger.debug("tfidf: " + str(tfidf))
+        logger.debug(u"tfidf: " + str(tfidf))
 
         corpus_tfidf = tfidf[self.corpus]
-        logger.debug("corpus_tfidf: " + str(corpus_tfidf))
+        logger.debug(u"corpus_tfidf: " + str(corpus_tfidf))
 
         # I can print out the topics for LSI
         self.lsi = lsimodel.LsiModel(corpus_tfidf, id2word=self.dictionary, num_topics=nt)
-        logger.debug("LSI Complete")
+        logger.debug(u"LSI Complete")
         corpus_lsi = self.lsi[self.corpus]
 
-        logger.debug("lsi.print_topics: " + str(self.lsi.print_topics))
+        logger.debug(u"lsi.print_topics: " + str(self.lsi.print_topics))
 
         count = 1
         topics = list()
@@ -153,20 +153,20 @@ class TopicsModel(object):
         tp = dict()
 
         for top in lsiList:
-          logger.debug("Topic [" + str(lsiList.index(top)) + "] " + str(top))
+            logger.debug(u"Topic [" + str(lsiList.index(top)) + u"] " + str(top))
 
-          for wordcluster in top.split(" +"):
-              key = wordcluster.split("*")[1].lower().strip("\"")
-              value = TopicsModel.convertMetric(wordcluster.split("*")[0])
+            for wordcluster in top.split(u" +"):
+                key = wordcluster.split(u"*")[1].lower().strip(u"\"")
+                value = TopicsModel.convertMetric(wordcluster.split(u"*")[0])
 
-              if tp.has_key(key):
-                tp[key] += abs(value)
-              else:
-                tp[key] = abs(value)
+                if key in tp:
+                    tp[key] += abs(value)
+                else:
+                    tp[key] = abs(value)
 
         return tp.items()
 
-    def computeSimilar(self, j, documentsList, threshold = 0.98):
+    def computeSimilar(self, j, documentsList, threshold=0.98):
 
         doc = documentsList[j]
 
@@ -174,32 +174,32 @@ class TopicsModel(object):
 
         # convert the query to LSI space
         vec_lsi = self.lsi[vec_bow]
-        logger.debug("vec_lsi: %s" % (vec_lsi))
+        logger.debug(u"vec_lsi: %s" % (vec_lsi))
 
         self.index = similarities.MatrixSimilarity(self.lsi[self.corpus])
-        #self.index.save(self.index)
+        # self.index.save(self.index)
 
         # perform a similarity query against the corpus
         sims = self.index[vec_lsi]
 
-        logger.debug("len       : %s" % (sims))
-        logger.debug("similarity: %s" % (sims))
-        logger.debug("type      : %s" % (type(sims)))
-        logger.debug("shape     : %s" % (sims.shape))
+        logger.debug(u"len       : %s" % (sims))
+        logger.debug(u"similarity: %s" % (sims))
+        logger.debug(u"type      : %s" % (type(sims)))
+        logger.debug(u"shape     : %s" % (sims.shape))
 
         simsList = sims.tolist()
-        #simsList = list(enumerate(sims))
+        # simsList = list(enumerate(sims))
 
-        logger.debug("len       : %s" % (len(simsList)))
-        logger.debug("similarity: %s" % (simsList))
-        logger.debug("type      : %s" % (type(simsList)))
+        logger.debug(u"len       : %s" % (len(simsList)))
+        logger.debug(u"similarity: %s" % (simsList))
+        logger.debug(u"type      : %s" % (type(simsList)))
 
         documentSimilarity = list()
 
         for i in range(0, len(simsList)-1):
             if (simsList[i] > threshold) and (documentsList[j] != documentsList[i])  :
-                logger.debug("Document     : %s" % (documentsList[j]))
-                logger.debug("Similar[%s]: %s" % (documentsList[i], simsList[i]))
+                logger.debug(u"Document     : %s" % (documentsList[j]))
+                logger.debug(u"Similar[%s]: %s" % (documentsList[i], simsList[i]))
 
                 sl = list()
                 sl.append(str(simsList[i]))
@@ -207,7 +207,7 @@ class TopicsModel(object):
                 sl.append(documentsList[i])
                 documentSimilarity.append(sl)
 
-        logger.debug("Document Similarity List %s" % (documentSimilarity))
+        logger.debug(u"Document Similarity List %s" % (documentSimilarity))
 
         return documentSimilarity
 
@@ -218,16 +218,16 @@ class TopicsModel(object):
         wordcount = 0
 
         # Iterate through the Concepts
-        logger.debug("Concept Name:" + concepts.name)
+        logger.debug(u"Concept Name:" + unicode(concepts.name))
 
         pc = concepts.getConcepts()
         for p in pc.values():
-            logger.debug("Concept: %s" % p.name)
+            logger.debug(u"Concept: %s" % unicode(p.name))
 
             # Iterate through the Words
             wc = p.getConcepts()
             for w in wc.values():
-                logger.debug("Word: %s" % w.name)
+                logger.debug(u"Word: %s" % unicode(w.name))
                 texts.append(w.name)
                 wordcount += 1
 
@@ -236,24 +236,24 @@ class TopicsModel(object):
 
         return documents, wordcount
     
-    def loadConceptsWords(self, concepts, delim=" "):
+    def loadConceptsWords(self, concepts, delim=u" "):
         documents = list()
         texts = list()
 
         wordcount = 0
 
         # Iterate through the Concepts
-        logger.debug("Concept Name:" + concepts.name)
+        logger.debug(u"Concept Name:" + concepts.name)
 
         for document in concepts.getConcepts().values():
-            logger.debug("Doc: %s" % document.name)
+            logger.debug(u"Doc: %s" % document.name)
 
             for sentence in document.getConcepts().values():
-                logger.debug("  sent: %s" % sentence.name)
+                logger.debug(u"  sent: %s" % sentence.name)
 
                 for word in sentence.name.split(delim):
                     if len(word) > 1:
-                        logger.debug("    Word: %s" % word)
+                        logger.debug(u"    Word: %s" % word)
                         texts.append(word.lower().strip())
                         wordcount += 1
 

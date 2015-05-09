@@ -34,23 +34,23 @@ class TopicCloud(object):
 
         self.lemmatizer = WordNetLemmatizer()
 
-        if homeDir == None:
+        if homeDir is None:
             self.homeDir = os.getcwd() + os.sep
         else:
             self.homeDir = homeDir
             
-        if imageFile == None:
+        if imageFile is None:
             self.imageFile = self.homeDir + u"topicCloud.png"
         else:
             self.imageFile = imageFile
 
-        if font_path == None:
+        if font_path is None:
             self.font_path = self.homeDir + u'DroidSans.ttf'
         else:
             self.font_path = font_path
 
     def _getDictConcepts(self, concepts, typeName, dictConcepts=None):
-        if dictConcepts == None:
+        if dictConcepts is None:
             dictConcepts = dict()
 
         if len(concepts.getConcepts()) == 0:
@@ -73,19 +73,19 @@ class TopicCloud(object):
 
     def getLemma(self, name):
 
-        name.replace(".", "")
+        name.replace(u".", u"")
 
-        sn = ""
+        sn = u""
 
-        for x in name.split(" "):
+        for x in name.split(u" "):
             lemmaWord = self.lemmatizer.lemmatize(x.lower())
-            sn = sn + " " + lemmaWord
+            sn = sn + u" " + lemmaWord
 
         logger.debug(u"New Lemma : %s" % sn)
 
         return sn
 
-    def createTagCloud(self, typeName=u"Topic", size_x=1800, size_y=1400, numWords=100, scale = 1.0):
+    def createTagCloud(self, typeName=u"Topic", size_x=1800, size_y=1400, numWords=100, scale=1.0):
 
         logger.info(u"Starting with %d Topics" % len(self.topicsConcepts.getConcepts()))
 
@@ -100,7 +100,7 @@ class TopicCloud(object):
         e = sorted(dictConcepts.iteritems(), key=itemgetter(1), reverse=True)[:numWords]
         logger.debug(u"e = %s" % e)
 
-        tags = " ".join([x * int(y) for x, y in e])
+        tags = u" ".join([x * int(y) for x, y in e])
 
         wordcloud = WordCloud(
               font_path=self.font_path,
@@ -113,7 +113,7 @@ class TopicCloud(object):
         plt.imshow(wordcloud)
         plt.axis(u'off')
         plt.savefig(self.imageFile, dpi=300)
-        #plt.show()
+        # plt.show()
 
         logger.info(u"Saving Tag Cloud - %s" % self.imageFile)
 

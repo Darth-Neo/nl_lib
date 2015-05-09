@@ -3,7 +3,7 @@
 # Concept Class for NLP
 #
 __VERSION__ = 0.1
-__author__ = 'morrj140'
+__author__ = u'morrj140'
 
 from nl_lib.Constants import *
 from traceback import format_exc
@@ -20,30 +20,38 @@ from nl_lib.Logger import *
 logger = setupLogging(__name__)
 logger.setLevel(INFO)
 
-delchars = ''.join(c for c in map(chr, range(256)) if not c.isalnum())
+#
+# Hack to get GraphViz to work
+#
+os.environ[u'PATH'] = u"%s:/opt/local/bin" % os.environ[u'PATH']
+
+# delchars = ''.join(c for c in map(chr, range(256)) if not c.isalnum())
 
 #
 # Base Class - ConceptGraph to export Concepts into Graph
 #
+
+
 class ConceptGraph(object):
+
     nodeDict = dict()
     labelDict = dict()
 
     def _cleanString(self, s):
-        r = ""
-        if s == None:
+        r = u""
+        if s is not None:
             return r
 
-        for x in s.lstrip(" "):
-            if x.isalnum() or x in (" ", "-", "."):
+        for x in s.lstrip(u" "):
+            if x.isalnum() or x in (u" ", u"-", u"."):
                 r = r + x
-        return r.lstrip(" ").rstrip(" ")
+        return r.lstrip(u" ").rstrip(u" ")
 
     def __init__(self):
         logger.info(u"ConceptGraph Constructor")
 
     def isFiltered(self, filterDict, concept):
-        if filterDict == None:
+        if filterDict is not None:
             return True
 
         if filterDict.has_key(concept.typeName):
@@ -64,13 +72,13 @@ class ConceptGraph(object):
             c = self.nodeDict[concept.name]
         else:
             c = self.addNode(concept)
-            logger.debug(u"Add Node: " + concept.name + ": " + str(c))
+            logger.debug(u"Add Node: " + concept.name + u": " + str(c))
             self.nodeDict[concept.name] = c
             concept.urn = c
             self.labelDict[concept.typeName] = concept.typeName
 
-        if (n > depth):
-            logger.debug(u"Reached depth["+ str(depth) + "] = " + str(n))
+        if n > depth:
+            logger.debug(u"Reached depth["+ str(depth) + u"] = " + str(n))
             return c
 
         pc = concept.getConcepts()
@@ -78,7 +86,7 @@ class ConceptGraph(object):
         for p in pc:
             if self.isFiltered(filterDict, pc[p]):
                 self.addConcepts(pc[p], filterDict, depth, n)
-                logger.debug(u"Add Edge: " + concept.name + " - " + concept.typeName + " - " + pc[p].name)
+                logger.debug(u"Add Edge: " + concept.name + u" - " + concept.typeName + u" - " + pc[p].name)
                 logger.debug(u"   Node: " + str(self.nodeDict[concept.name]))
                 logger.debug(u"   Node: " + str(self.nodeDict[pc[p].name]))
                 self.addEdge(concept, pc[p])
@@ -92,7 +100,7 @@ class ConceptGraph(object):
             c = self.nodeDict[concept.name]
         else:
             c = self.addNode(concept)
-            logger.debug(u"Add Node: " + concept.name + ": " + str(c))
+            logger.debug(u"Add Node: " + concept.name + u": " + str(c))
             self.nodeDict[concept.name] = c
             concept.urn = c
             self.labelDict[concept.typeName] = concept.typeName
@@ -101,7 +109,10 @@ class ConceptGraph(object):
 #
 # Neo4JGraph
 #
+
+
 class Neo4JGraph(ConceptGraph):
+
     graph = None
     gdb = None
     batches = None
@@ -115,7 +126,7 @@ class Neo4JGraph(ConceptGraph):
 
         self.batches = batches
 
-        if self.batches == True:
+        if self.batches:
             self.batch = neo4j.WriteBatch(self.graph)
 
     def clearGraphDB(self):
@@ -124,8 +135,8 @@ class Neo4JGraph(ConceptGraph):
         query.execute().data
 
     def processBatch(self, submit=True):
-        if self.batches == True:
-            if submit == True:
+        if self.batches:
+            if submit:
                 self.batch.submit()
             else:
                 self.batch.submit()
@@ -139,29 +150,29 @@ class Neo4JGraph(ConceptGraph):
             typeName = self.labelDict[t].translate(None, self.delchars).strip()
             qs = u"match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
             logger.debug(u"Label :" + qs)
-            query = self.query(qs)
+            self.query(qs)
 
             if typeName.find(u"Relationship") != -1:
                 qs = u"match (n) where (n.typeName=\"%s\") set n:Relation" % (typeName)
                 logger.debug(u"HyperEdge :" + qs)
-                query = self.query(qs)
+                self.query(qs)
 
             elif typeName.find(u"Business") != -1:
                 qs = u"match (n) where (n.typeName=\"%s\") set n:Business" % (typeName)
                 logger.info(u"HyperEdge :" + qs)
-                query = self.query(qs)
+                self.query(qs)
 
             elif typeName.find(u"Application") != -1:
                 qs = u"match (n) where (n.typeName=\"%s\") set n:Application" % (typeName)
                 logger.debug(u"HyperEdge :" + qs)
-                query = self.query(qs)
+                self.query(qs)
 
     def createIndices(self):
         for t in self.labelDict:
             try:
                 typeName = self.labelDict[t].translate(None, self.delchars).strip()
-                qs = u"CREATE INDEX ON :%s (name)" % (typeName)
-                #qs = "match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
+                qs = u"CREATE INDEX ON :%s (name)" % typeName
+
                 logger.debug(u"Label :" + qs)
                 query = neo4j.CypherQuery(self.graph, qs)
                 query.execute().data
@@ -174,7 +185,7 @@ class Neo4JGraph(ConceptGraph):
             try:
                 typeName = self.labelDict[t].translate(None, self.delchars).strip()
                 qs = u"DROP INDEX ON :%s (name)" % (typeName)
-                #qs = "match (n) where (n.typeName=\"%s\") set n:%s" % (typeName, typeName)
+
                 logger.debug(u"Label :" + qs)
                 query = neo4j.CypherQuery(self.graph, qs)
                 query.execute().data
@@ -187,16 +198,16 @@ class Neo4JGraph(ConceptGraph):
         prop = concept.getProperties()
 
         if len(prop) != 0:
-            ps = ""
+            ps = u""
             for kk, vv in prop.items():
-                if (vv != None and len(vv) > 0) and (kk != None and len(kk) > 0):
-                    k = self._cleanString(kk)
-                    v = self._cleanString(vv)
+                if (vv is not None and len(vv) > 0) and (kk is not None and len(kk) > 0):
+                    k = unicode(kk)  # self._cleanString(kk)
+                    v = unicode(vv)  # self._cleanString(vv)
 
                     logger.debug(u"%s : %s" % (k, v))
-                    ps = ps + u" %s : \"%s\", " % (k, v)
+                    ps = u"%s %s : \"%s\", " % (ps, k, v)
 
-            ps = ps[:-2] # remove the last comma
+            ps = ps[:-2]  # remove the last comma
 
             logger.debug(u"ps : %s" % ps)
 
@@ -209,19 +220,19 @@ class Neo4JGraph(ConceptGraph):
 
         logger.debug(u"Node Query : '%s'" % qs)
 
-        if self.batches == True:
-            bqs = qs + " ; "
+        if self.batches:
+            bqs = u"%s ; " % qs
             self.batch.append_cypher(bqs)
         else:
             query = neo4j.CypherQuery(self.graph, qs)
             return query.execute().data
         
-    def addEdge (self, parentConcept, childConcept, type=None):
+    def addEdge(self, parentConcept, childConcept, type=None):
 
-        if type!=None:
-            typeName = type
+        if type is not None:
+            typeName = unicode(type)
         else:
-            typeName = childConcept.typeName
+            typeName = unicode(childConcept.typeName)
 
         qs0 = u"match "
         qs1 = u"(n {name : \"%s\", typeName:\"%s\"}), " % (parentConcept.name, parentConcept.typeName)
@@ -237,7 +248,7 @@ class Neo4JGraph(ConceptGraph):
 
         logger.debug(u"Edge Query .%s." % qs)
 
-        if self.batches == True:
+        if self.batches:
             self.batch.append_cypher(qs)
         else:
             query = neo4j.CypherQuery(self.graph, qs)
@@ -278,7 +289,6 @@ class Neo4JGraph(ConceptGraph):
             if len(c.getConcepts()) != 0:
                 self._addGraphEdges(c, n)
 
-
     def Counts(self):
         qs = u"MATCH (n) RETURN n.typeName, count(n.typeName) order by count(n.typeName) DESC"
         lq, qd = self.query(qs)
@@ -289,80 +299,77 @@ class Neo4JGraph(ConceptGraph):
 #
 # NetworkXGraph
 #
+
+
 class NetworkXGraph(ConceptGraph):
+
     G = None
     layout = None
     filename = None
 
     def __init__(self, filename=None):
-        self.G=nx.Graph()
-        self.layout=nx.spring_layout
-        if filename == None:
+
+        self.G = nx.Graph()
+        self.layout = nx.spring_layout
+
+        if filename is not None:
             filename = gmlFile
+
         self.filename = filename
-        logger.debug("GML saved to :" + self.filename)
+        logger.debug(u"GML saved to :" + self.filename)
 
     def clearGraphDB(self):
-        self.G=nx.Graph()
+        self.G = nx.Graph()
 
     def saveGraph(self, filename=None):
-        if filename == None:
+        if filename is None:
             filename = os.getcwd() + os.sep + gmlFile
-        logger.debug(str(self.G.nodes(data=True)))
+        dbg = unicode(self.G.nodes(data=True))
+        logger.debug(u"%s" % dbg)
         nx.write_gml(self.G, filename)
 
     def addNode(self, concept):
         return self.G.add_node(concept.name, count=concept.count, typeName=concept.typeName)
 
-    def addEdge (self, parentConcept, childConcept, type=None):
-        if type!=None:
-            typeName = type
-        else:
-            typeName = childConcept.typeName
-
+    def addEdge(self, parentConcept, childConcept, type=None):
         return self.G.add_edge(parentConcept.name, childConcept.name)
 
     def saveGraphPajek(self, filename=None):
-        if filename == None:
-            filename = "concept.net"
+        if filename is not None:
+            filename = u"concept.net"
         nx.write_pajek(self.G,filename)
         
     def drawGraph(self, GML_ONLY=True, filename=None):
-        if filename == None:
-            filename = imageFile
+        if filename is not None:
+            self.filename = imageFile
+
         logger.debug(str(self.G.nodes(data=True)))
 
-        #nx.write_pajek(self.G,"people.paj")
-        #nx.write_gml(self.G,"people.gml")
-        #nx.write_graphml(self.G,"people2.gml")
+        # nx.write_pajek(self.G,"people.paj")
+        # nx.write_gml(self.G,"people.gml")
+        # nx.write_graphml(self.G,"people2.gml")
 
-        if GML_ONLY == True:
+        if GML_ONLY:
             nx.write_gml(self.G, self.filename)
         else:
-            pos=nx.spring_layout(self.G,iterations=500)
+            pos = nx.spring_layout(self.G,iterations=500)
             nx.draw(self.G, pos, node_size=200,cmap=plt.cm.Blues, with_labels=True)
             plt.show()
-
-    def drawSocialGraph(self):
-        graph = self.G
-        nx.draw_graphviz(graph,
-                 node_size = [16 * graph.degree(n) for n in graph],
-                 node_color = [graph.depth[n] for n in graph],
-                 with_labels = False)
-        plt.show()
 
 #
 # PatternGraph
 #
+
+
 class PatternGraph(ConceptGraph):
     g = None
 
     def __init__(self, homeDir=None):   
 
-        if homeDir == None:
-            homeDir = os.curdir
+        if homeDir is None:
+            homeDir = os.getcwd()
             
-        self.homeDir = homeDir + os.sep + 'html'
+        self.homeDir = homeDir + os.sep + u"html"
         
         if not os.path.exists(self.homeDir):
             os.makedirs(self.homeDir)
@@ -372,18 +379,14 @@ class PatternGraph(ConceptGraph):
     def addNode(self, n):
         self.g.add_node(n.name)
 
-    def addEdge(self, p, c, type=None):
-        if type!=None:
-            typeName = type
-        else:
-            typeName = c.typeName
+    def addEdge(self, p, c):
 
-        self.g.add_edge(p.name, c.name, stroke=(0,0,0,0.75)) # R,G,B,A
+        self.g.add_edge(p.name, c.name, stroke=(0, 0, 0, 0.75))  # R,G,B,A
     
-    def exportGraph(self, title="Pattern Graph"):
-        logger.debug("exportGraph")
+    def exportGraph(self, title=u"Pattern Graph"):
+        logger.debug(u"exportGraph")
         
-        logger.info("Graph Size: %d" % self.g.__len__())
+        logger.info(u"Graph Size: %d" % self.g.__len__())
         
         k = self.subGraph()
         
@@ -394,8 +397,8 @@ class PatternGraph(ConceptGraph):
             klimit = len(k)
             
         for i in range(0, klimit):
-            logger.debug("Graph[%d]=%d" % (i, len(k[i])))
-            newDir = self.homeDir + os.sep + "graph" + str(i)
+            logger.debug(u"Graph[%d]=%d" % (i, len(k[i])))
+            newDir = self.homeDir + os.sep + u"graph" + str(i)
             h = k[i] 
             h.export(newDir, overwrite=True, directed=True, weighted=0.5, title=title)
             i += 1
@@ -408,19 +411,19 @@ class PatternGraph(ConceptGraph):
         i = 0
         newGraph = Graph()
         for n in h.sorted()[:30]:
-            i = i + 1
+            i += 1
             n.fill = (0, 0.5, 1, 0.75 * n.weight)
-            logger.debug("i:%d=%s" % (i, n))
+            logger.debug(u"i:%d=%s" % (i, n))
             newGraph.add_node(n.id)
-            logger.debug("edges : %s" % n.edges)
+            logger.debug(u"edges : %s" % n.edges)
     
             for e in n.edges:
-                logger.debug("edge1 : %s, edge2 : %s" % (e.node1.id, e.node2.id))
+                logger.debug(u"edge1 : %s, edge2 : %s" % (e.node1.id, e.node2.id))
                 if e.node1.id == n.id:
                     newGraph.add_node(e.node2.id)
                 else:
                     newGraph.add_node(e.node1.id)
-                newGraph.add_edge(e.node1.id, e.node2.id, stroke=(0,0,0,0.75))
+                newGraph.add_edge(e.node1.id, e.node2.id, stroke=(0, 0, 0, 0.75))
         
         h = newGraph.split()
         
@@ -429,28 +432,26 @@ class PatternGraph(ConceptGraph):
 #
 # GraphVizGraph
 #
+
+
 class GraphVizGraph(ConceptGraph):
+
     g = None
 
     def __init__(self):
-        self.g = pgv.AGraph(directed=True,strict=True,rankdir='LR')
+        self.g = pgv.AGraph(directed=True, strict=True, rankdir=u'LR')
 
-        #
-        # Hack to get GraphViz to work
-        #
-        os.environ[u'PATH'] = u"%s:/opt/local/bin" % os.environ[u'PATH']
-
-    def addNode(self, n, color="black", shape="box"):
+    def addNode(self, n, color=u"black", shape=u"box"):
         self.g.add_node(n.name, color=color, shape=shape)
 
-    def addEdge(self, p, c, color='green'):
+    def addEdge(self, p, c, color=u"green"):
         self.g.add_edge(p.name, c.name, color=color)
 
-    def exportGraph(self, filename="example.png"):
-        logger.debug("exportGraph")
+    def exportGraph(self, filename=u"example.png"):
+        logger.debug(u"exportGraph")
 
         # adjust a graph parameter
-        self.g.graph_attr['epsilon']='0.001'
-        logger.debug(self.g.string()) # print dot file to standard output
-        self.g.layout('dot') # layout with dot
-        self.g.draw(filename) # write to file
+        self.g.graph_attr[u"epsilon"] = u"0.001"
+        logger.debug(self.g.string())  # print dot file to standard output
+        self.g.layout(u"dot")  # layout with dot
+        self.g.draw(filename)  # write to file
