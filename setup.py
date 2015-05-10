@@ -41,10 +41,6 @@ setup(name='nl_lib',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.1',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
     ],
 
     # What does your project relate to?
@@ -52,7 +48,7 @@ setup(name='nl_lib',
 
     # List run-time dependencies here.  These will be installed by pip when your
     # project is installed.
-    install_requires=['nltk', 'pattern', 'gensim', 'networkx', 'matplotlib', 'pywordcloud', 'wordcloud',
-                      'numpy', 'py2neo', 'pygraphviz', 'pytest', 'pytest-cov', 'python-docx', 'python-pptx'],)
+    install_requires=['cython', 'nltk', 'pattern', 'gensim', 'networkx', 'matplotlib', 'pywordcloud',
+                      'py2neo', 'pygraphviz', 'pytest-cov', 'pytest', 'python-docx', 'python-pptx'],)
 
 

@@ -164,7 +164,7 @@ class Neo4JGraph(ConceptGraph):
             if submit:
                 self.batch.submit()
             else:
-                self.batch.submit()
+                self.batch.run()
 
     def query(self, qs):
         query = neo4j.CypherQuery(self.graph, qs)

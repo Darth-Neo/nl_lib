@@ -16,8 +16,7 @@ logger.setLevel(INFO)
 
 from Constants import *
 from Concepts import Concepts
-from ConceptGraph import PatternGraph, GraphVizGraph, NetworkXGraph
-
+from ConceptGraph import PatternGraph, GraphVizGraph, NetworkXGraph, Neo4JGraph
 __author__ = u'morrj140'
 __VERSION__ = u'0.2'
 
@@ -114,9 +113,34 @@ def test_GraphVizGraph(cleandir):
 
     assert (os.path.isfile(exportFileImageTest) is True)
 
+
+@pytest.mark.ConceptsGraph
+def test_Neo4JGraph():
+
+    assert (os.path.isfile(conceptsTest) is True)
+    concepts = Concepts.loadConcepts(conceptsTest)
+
+    graph = Neo4JGraph(gdb)
+
+    logger.info(u"Adding %s nodes the graph ..." % type(graph))
+    graph.addGraphNodes(concepts)
+
+    logger.info(u"Adding %s edges the graph ..." % type(graph))
+    graph.addGraphEdges(concepts)
+
+    qs = u"MATCH (n) RETURN n.typeName, count(n.typeName) as Count order by Count DESC"
+    lq, qd = graph.query(qs)
+
+    logger.info(u"Neo4J Counts")
+
+    assert lq is not None
+
+
 if __name__ == u"__main__":
     test_NetworkXGraph(cleandir)
 
     test_GraphVizGraph(cleandir)
 
     test_PatternGraph(cleandir)
+
+    test_Neo4JGraph()
