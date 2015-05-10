@@ -147,5 +147,28 @@ def test_addListConcepts(cleandir):
     assert(len(cd) > 0)
     assert(len(cd) == 4)
 
+
+@pytest.mark.Concepts
+def test_clean_concepts(cleandir):
+    logger.info("test_clean_concepts")
+    key, value, c = setup()
+
+    assert (c is not None)
+
+    c.logConcepts()
+
+    Concepts.cleanConcepts(c)
+
+    assert(c is not None)
+
+    c.logConcepts()
+
 if __name__ == u"__main__":
-    test_Concepts()
+    clean_dir = os.getcwd()
+    test_Concepts(clean_dir)
+    test_clean_concepts(cleandir)
+    test_addListConcepts(cleandir)
+    test_addListConcepts(cleandir)
+    test_sorted_concepts(cleandir)
+    test_concepts_dict(cleandir)
+    test_Concepts_Props(cleandir)
