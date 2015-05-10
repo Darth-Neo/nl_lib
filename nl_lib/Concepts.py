@@ -27,8 +27,8 @@ class Concepts(object):
     properties = None
 
     def __init__(self, name=None, typeName=None):
-        self.name = unicode(name)
-        self.typeName = unicode(typeName)
+        self.name = name.encode("ascii", errors='replace')
+        self.typeName = typeName.encode("ascii", errors='replace')
         self.cd = dict()
         self.properties = dict()
         self.count = 0
@@ -97,12 +97,16 @@ class Concepts(object):
         nl = list()
         for n in typeNameDict:
             logger.info(u"n - %s" % n)
+
             cl = list()
             cl.append(typeNameDict[n].name)  # 0
+
             wl = list()
             c = typeNameDict[n].getConcepts()
+
             for v in c:
                 wl.append(unicode(c[v].name))
+
             cl.append(self._sdp(typeNameDict[n].count, len(wl)))  # 1
             cl.append(typeNameDict[n].count)  # 2
             cl.append(wl)  # 3
@@ -171,8 +175,8 @@ class Concepts(object):
 
     def addConceptKeyType(self, keyConcept, typeConcept):
 
-        k = unicode(keyConcept)
-        t = unicode(typeConcept)
+        k = keyConcept.encode("ascii", errors='replace')
+        t = typeConcept.encode("ascii", errors='replace')
 
         self.incCount()
 
@@ -238,10 +242,10 @@ class Concepts(object):
         logger.debug(u"%s%d[%s]" % (spaces, n, rs))
 
         if len(concepts.getConcepts().values()) == 0:
-            return rs + u"\n"
+            return u"%s\n" % rs
 
         for c in concepts.getConcepts().values():
-            rs = rs + Concepts._lineCSV(c, cstr)
+            rs = u"%s%s" % (rs, Concepts._lineCSV(c, cstr))
             logger.debug(u"%s%s[%s]" % (spaces, n, rs))
 
         logger.debug(u"%s%d[%s]" % (spaces, n, rs))
