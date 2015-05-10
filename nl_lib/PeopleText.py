@@ -5,8 +5,9 @@
 __VERSION__ = 0.1
 __author__ = u'morrj140'
 
-from nl_lib import Logger
-logger = Logger.setupLogging(__name__)
+from Logger import *
+logger = setupLogging(__name__)
+logger.setLevel(INFO)
 
 
 def cleanPeople(name):

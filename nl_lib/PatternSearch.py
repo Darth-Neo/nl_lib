@@ -6,13 +6,14 @@ from pattern.web import Bing, Google, Wikipedia, plaintext, encode_utf8, URL, ex
 from pattern.en import parsetree
 from pattern.search import search
 
-from nl_lib import Logger
-logger = Logger.setupLogging(__name__)
+from Logger import *
+logger = setupLogging(__name__)
+logger.setLevel(INFO)
 
-from nl_lib.Constants import *
-from nl_lib.Concepts import Concepts
-from nl_lib.TopicCloud import TopicCloud
-from nl_lib.ConceptGraph import PatternGraph, NetworkXGraph, Graph
+from Constants import *
+from Concepts import Concepts
+from TopicCloud import TopicCloud
+from ConceptGraph import PatternGraph, NetworkXGraph, Graph
 
 __VERSION__ = 0.1
 __author__ = u'morrj140'

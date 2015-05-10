@@ -7,7 +7,7 @@
 __author__ = u'morrj140'
 __VERSION__ = u'0.2'
 
-from nl_lib.Logger import *
+from Logger import *
 logger = setupLogging(__name__)
 logger.setLevel(INFO)
 
@@ -56,6 +56,7 @@ def setup():
 
 @pytest.mark.Concepts
 def test_Concepts(cleandir):
+    logger.info("%s" % __name__)
 
     key, value, c = setup()
 
@@ -67,6 +68,7 @@ def test_Concepts(cleandir):
 
 @pytest.mark.Concepts
 def test_Concepts_Props(cleandir):
+    logger.info("%s" % __name__)
     key, value, c = setup()
 
     d = dict()
@@ -80,6 +82,7 @@ def test_Concepts_Props(cleandir):
 
 @pytest.mark.Concepts
 def test_concepts_dict(cleandir):
+    logger.info("%s" % __name__)
     key, value, c = setup()
 
     d = c.dictChildrenType(value)
@@ -90,6 +93,7 @@ def test_concepts_dict(cleandir):
 
 @pytest.mark.Concepts
 def test_sorted_concepts(cleandir):
+    logger.info("%s" % __name__)
     key, value, c = setup()
 
     sc = c.sortConcepts(value)
@@ -101,6 +105,7 @@ def test_sorted_concepts(cleandir):
 
 @pytest.mark.Concepts
 def test_listCSVConcepts(cleandir):
+    logger.info("%s" % __name__)
     key, value, c = setup()
 
     sc = c.listCSVConcepts()
@@ -112,6 +117,7 @@ def test_listCSVConcepts(cleandir):
 
 @pytest.mark.Concepts
 def test_addConcept(cleandir):
+    logger.info("%s" % __name__)
     key, value, c = setup()
 
     dkey = u"nd"
@@ -131,7 +137,7 @@ def test_addConcept(cleandir):
 
 @pytest.mark.Concepts
 def test_addListConcepts(cleandir):
-
+    logger.info("%s" % __name__)
     key, value, c = setup()
 
     listConcepts = list()
@@ -150,7 +156,7 @@ def test_addListConcepts(cleandir):
 
 @pytest.mark.Concepts
 def test_clean_concepts(cleandir):
-    logger.info("test_clean_concepts")
+    logger.info("%s" % __name__)
     key, value, c = setup()
 
     assert (c is not None)

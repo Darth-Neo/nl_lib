@@ -9,8 +9,9 @@ import os
 import sys
 import pickle
 
-from nl_lib import Logger
-logger = Logger.setupLogging(__name__)
+from Logger import *
+logger = setupLogging(__name__)
+logger.setLevel(INFO)
 
 #
 # Concept Class which support recursive concepts via a dictionary
@@ -192,9 +193,10 @@ class Concepts(object):
             logger.debug(u"%s:%s" % (p.name, p.typeName))
             self.addConcept(p)
 
-    @staticmethod
-    def cleanConcepts(concept, n=0):
-        pc = concept.getConcepts()
+    def cleanConcepts(self, n=0):
+
+        logger.info(u"%s : %s", self.name, self.typeName)
+        pc = self.getConcepts()
 
         spaces = u" " * n
 
@@ -202,7 +204,7 @@ class Concepts(object):
             logger.debug(u"%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
             p.name = p.name.strip(u"\"").encode("ascii", errors="replace")
             p.typeName = p.typeName.strip(u"\"").encode("ascii", errors="replace")
-            Concepts.cleanConcepts(p, n+1)
+            p.cleanConcepts(n+1)
 
     @staticmethod
     def saveConcepts(concepts, conceptFile):

@@ -4,12 +4,12 @@
 # nl_lib Testing
 # __author__ = 'morrj140'
 import os
-from nl_lib.Logger import *
+from Logger import *
 logger = setupLogging(__name__)
 logger.setLevel(INFO)
 
-from nl_lib.TopicCloud import TopicCloud
-from nl_lib.Concepts import Concepts
+from TopicCloud import TopicCloud
+from Concepts import Concepts
 
 import pytest
 from test_Constants import *

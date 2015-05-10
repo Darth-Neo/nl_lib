@@ -3,7 +3,7 @@
 
 import sys
 
-from nl_lib.Logger import *
+from Logger import *
 logger = setupLogging(__name__)
 logger.setLevel(INFO)
 

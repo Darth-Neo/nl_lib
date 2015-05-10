@@ -13,7 +13,7 @@ from pattern.graph import Graph
 
 from py2neo import neo4j
 
-from nl_lib.Logger import *
+from Logger import *
 logger = setupLogging(__name__)
 logger.setLevel(INFO)
 
