@@ -61,7 +61,7 @@ class Concepts(object):
 
     def dictChildrenType(self, typeName, n=4, conceptFilter=None):
 
-        typeName = unicode(typeName)
+        typeName = typeName.encode("ascii", errors="replace")
         logger.debug(u"dictChildrenType %s" % typeName)
         if n < 1:
             return None
@@ -89,7 +89,8 @@ class Concepts(object):
         return z
 
     def sortConcepts(self, typeName):
-        logger.debug(u"sortConcepts - %s" % unicode(typeName))
+        typeName = typeName.encode("ascii", errors="replace")
+        logger.debug(u"sortConcepts - %s" % typeName)
 
         typeNameDict = self.dictChildrenType(typeName)
         logger.debug(u"typeNameDict : %s" % typeNameDict)
@@ -133,17 +134,6 @@ class Concepts(object):
             self._logProperties(p, spaces)
 
             p.logConcepts(n+1)
-
-    def cleanConcepts(self, n=0):
-        pc = self.getConcepts()
-
-        spaces = u" " * n
-
-        for p in pc.values():
-            logger.debug(u"%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
-            p.name = p.name.strip(u"\"").encode("ascii", errors="replace")
-            p.typeName = p.typeName.strip(u"\"").encode("ascii", errors="replace")
-            p.cleanConcepts(n+1)
 
     def listCSVConcepts(self, lcsv=None, n=0):
         pc = self.getConcepts()
@@ -192,13 +182,28 @@ class Concepts(object):
 
     def addConcept(self, concept):
         logger.debug(u"addConcept: %s " % concept.name)
+        Concepts.cleanConcepts(concept)
         self.cd[concept.name] = concept
         
     def addListConcepts(self, listConcepts):
         for p in listConcepts:
+            p.name = p.name.encode("ascii", errors='replace')
+            p.typeName = p.typeName.encode("ascii", errors='replace')
             logger.debug(u"%s:%s" % (p.name, p.typeName))
             self.addConcept(p)
-        
+
+    @staticmethod
+    def cleanConcepts(concept, n=0):
+        pc = concept.getConcepts()
+
+        spaces = u" " * n
+
+        for p in pc.values():
+            logger.debug(u"%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
+            p.name = p.name.strip(u"\"").encode("ascii", errors="replace")
+            p.typeName = p.typeName.strip(u"\"").encode("ascii", errors="replace")
+            Concepts.cleanConcepts(p, n+1)
+
     @staticmethod
     def saveConcepts(concepts, conceptFile):
         try:

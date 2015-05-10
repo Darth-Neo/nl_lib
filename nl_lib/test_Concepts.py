@@ -11,11 +11,10 @@ from nl_lib.Logger import *
 logger = setupLogging(__name__)
 logger.setLevel(INFO)
 
-from Constants import *
-from Concepts import Concepts
-
 import pytest
 from test_Constants import *
+
+from Concepts import Concepts
 
 @pytest.fixture(scope=u"module")
 def cleandir():
@@ -147,39 +146,6 @@ def test_addListConcepts(cleandir):
     assert(cd is not None)
     assert(len(cd) > 0)
     assert(len(cd) == 4)
-
-@pytest.mark.Concepts
-def test_encoding(cleandir):
-
-    # Note: Encode a string to UTF-8
-    # Note: Decode a string to Unicode
-
-    try:
-        u = "café"
-        ul = u.encode('utf-8', errors='strict')
-        logger.info("ul %s.%s." % (type(ul), ul))
-
-        s = "Flügel"
-        logger.info("%s:%s" % (type(s), s))
-
-        sl = s.decode('utf-8')
-        logger.info("sl %s.%s." % (type(sl), sl))
-
-        p = "Hi!"
-        pl = unicode(p, "utf-8")
-        logger.info("p %s:%s\tpl %s:%s" % (type(p), p, type(pl), pl))
-
-        us = "Hi!"
-        sl = us.decode('utf-8')
-        logger.info("sl %s:%s" % (type(sl), sl))
-
-        q = 'Fl\xfcgel'
-        logger.info("q %s:%s" % (type(q), q))
-
-        ql = q.encode('utf-8')
-        logger.info("ql %s:%s" % (type(q), ql))
-    except:
-        pass
 
 if __name__ == u"__main__":
     test_Concepts()

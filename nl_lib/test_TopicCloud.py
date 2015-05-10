@@ -27,7 +27,7 @@ def cleandir():
             os.remove(ftr)
 
 
-@pytest.mark.TopicsMode
+@pytest.mark.TopicsModel
 def test_CreateTopicCloud(cleandir):
 
     logger.debug(u"CWD : %s" % os.getcwd())

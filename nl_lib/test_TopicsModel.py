@@ -11,12 +11,12 @@ from nl_lib.Logger import *
 logger = setupLogging(__name__)
 logger.setLevel(INFO)
 
+from test_Constants import *
 from Constants import *
 from Concepts import Concepts
 from TopicsModel import TopicsModel
 
 import pytest
-from test_Constants import *
 
 
 @pytest.fixture(scope=u"module")
@@ -30,7 +30,7 @@ def cleandir():
             logger.info(u"remove : %s" % ftr)
             os.remove(ftr)
 
-@pytest.mark.TopicsMode
+@pytest.mark.TopicsModel
 def test_CreateTopics(cleandir):
 
     num_topics = 100

@@ -2,9 +2,6 @@
 #
 # Concept Class for NLP
 #
-__VERSION__ = 0.1
-__author__ = u'morrj140'
-
 from nl_lib.Constants import *
 from traceback import format_exc
 
@@ -14,11 +11,14 @@ import matplotlib.pyplot as plt
 import pygraphviz as pgv
 from pattern.graph import Graph
 
-from py2neo import neo4j, node, rel
+from py2neo import neo4j
 
 from nl_lib.Logger import *
 logger = setupLogging(__name__)
 logger.setLevel(INFO)
+
+__VERSION__ = 0.1
+__author__ = u'morrj140'
 
 #
 # Hack to get GraphViz to work
@@ -104,6 +104,32 @@ class ConceptGraph(object):
             self.labelDict[concept.typeName] = concept.typeName
 
         return c
+
+    def addGraphNodes(self, concepts, n=0):
+        n += 1
+
+        for c in concepts.getConcepts().values():
+            logger.debug(u"%d : %d Node c : %s:%s" % (n, len(c.getConcepts()), c.name, c.typeName))
+
+            self.addConcept(c)
+
+            self.addGraphNodes(c, n)
+
+    def addGraphEdges(self, concepts, n=0):
+        n += 1
+
+        self.addConcept(concepts)
+
+        for c in concepts.getConcepts().values():
+
+            logger.debug(u"%d : %d %s c : %s:%s" % (n, len(c.getConcepts()), concepts.name, c.name, c.typeName))
+
+            self.addConcept(c)
+
+            self.addEdge(concepts, c)
+
+            if len(c.getConcepts()) != 0:
+                self.addGraphEdges(c, n)
 
 #
 # Neo4JGraph
@@ -260,40 +286,7 @@ class Neo4JGraph(ConceptGraph):
             query = neo4j.CypherQuery(self.graph, bqs)
             return query.execute().data
 
-    def processConcepts(self, concepts):
 
-        logger.info(u"Adding %s nodes the graph ..." % type(self.graph))
-        self._addGraphNodes(concepts)
-
-        logger.info(u"Adding %s edges the graph ..." % type(self.graph))
-        self._addGraphEdges(concepts)
-
-    def _addGraphNodes(self, concepts, n=0):
-
-        n += 1
-
-        for c in concepts.getConcepts().values():
-            logger.debug(u"%d : %d Node c : %s:%s" % (n, len(c.getConcepts()), c.name, c.typeName))
-
-            self.addConcept(c)
-
-            self._addGraphNodes(c, n)
-
-    def _addGraphEdges(self, concepts, n=0):
-        n += 1
-
-        self.addConcept(concepts)
-
-        for c in concepts.getConcepts().values():
-
-            logger.debug(u"%d : %d %s c : %s:%s" % (n, len(c.getConcepts()), concepts.name, c.name, c.typeName))
-
-            self.addConcept(c)
-
-            self.addEdge(concepts, c)
-
-            if len(c.getConcepts()) != 0:
-                self._addGraphEdges(c, n)
 
     def Counts(self):
         qs = u"MATCH (n) RETURN n.typeName, count(n.typeName) order by count(n.typeName) DESC"
