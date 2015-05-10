@@ -201,8 +201,8 @@ class Neo4JGraph(ConceptGraph):
             ps = u""
             for kk, vv in prop.items():
                 if (vv is not None and len(vv) > 0) and (kk is not None and len(kk) > 0):
-                    k = unicode(kk)
-                    v = unicode(vv)
+                    k = kk.encode.encode("ascii", errors="replace")
+                    v = vv.encode("ascii", errors="replace")
 
                     logger.debug(u"%s : %s" % (k, v))
                     ps = u"%s %s : \"%s\", " % (ps, k, v)
@@ -224,18 +224,19 @@ class Neo4JGraph(ConceptGraph):
         logger.debug(u"Node Query : '%s'" % qs)
 
         if self.batches:
-            bqs = u"%s ; " % qs
+            bqs = (u"%s ; " % qs).encode("ascii", errors="replace")
             self.batch.append_cypher(bqs)
         else:
+            bqs = (u"%s ; " % qs).encode("ascii", errors="replace")
             query = neo4j.CypherQuery(self.graph, qs)
             return query.execute().data
         
     def addEdge(self, parentConcept, childConcept, ttype=None):
 
         if ttype is not None:
-            typeName = unicode(ttype)
+            typeName = ttype.encode("ascii", errors="replace")
         else:
-            typeName = unicode(childConcept.typeName)
+            typeName = childConcept.typeName.encode("ascii", errors="replace")
 
         qs0 = u"match "
         qs1 = u"(n {name : \"%s\", typeName:\"%s\"}), " % (parentConcept.name, parentConcept.typeName)

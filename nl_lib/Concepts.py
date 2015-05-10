@@ -27,8 +27,8 @@ class Concepts(object):
     properties = None
 
     def __init__(self, name=None, typeName=None):
-        self.name = name.encode("ascii", errors='replace')
-        self.typeName = typeName.encode("ascii", errors='replace')
+        self.name = name.encode("ascii", errors="replace")
+        self.typeName = typeName.encode("ascii", errors="replace")
         self.cd = dict()
         self.properties = dict()
         self.count = 0
@@ -141,8 +141,8 @@ class Concepts(object):
 
         for p in pc.values():
             logger.debug(u"%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
-            p.name = p.name.strip(u"\"")
-            p.typeName = p.typeName.strip(u"\"")
+            p.name = p.name.strip(u"\"").encode("ascii", errors="replace")
+            p.typeName = p.typeName.strip(u"\"").encode("ascii", errors="replace")
             p.cleanConcepts(n+1)
 
     def listCSVConcepts(self, lcsv=None, n=0):
