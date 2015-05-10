@@ -2,17 +2,16 @@
 #
 # Concept Class for NLP
 #
-__VERSION__ = 0.1
-__author__ = u'morrj140'
-
-import sys
-import os
 import csv
 import urllib2
 from random import randint
+from Logger import *
+logger = setupLogging(__name__)
+logger.setLevel(DEBUG)
 
-import Logger
-logger = Logger.setupLogging(__name__)
+__VERSION__ = 0.1
+__author__ = u'morrj140'
+
 
 class Proxies(object):  
     proxyFile = None
@@ -51,11 +50,11 @@ class Proxies(object):
         p = u'http://' + proxy[0] + ':' + proxy[1]
         logger.info(u"Use Random Proxy %s" % (p))
         
-        proxy_support = urllib2.ProxyHandler({u"http" : p})
+        proxy_support = urllib2.ProxyHandler({u"http": p})
         opener = urllib2.build_opener(proxy_support)
         urllib2.install_opener(opener)
 
-        return urllib2.ProxyHandler({u"http" : p})
+        return urllib2.ProxyHandler({u"http": p})
         
 if __name__ == u'__main__':
     proxy = Proxies().randomProxyHandler()

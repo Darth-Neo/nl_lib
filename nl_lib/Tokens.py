@@ -2,28 +2,24 @@
 #
 # Concept Class for NLP
 #
-__VERSION__ = 0.1
-__author__ = 'morrj140'
-
-import os
-import sys
-
 import nltk
-from nltk import tokenize, tag, chunk
-from nltk.corpus import wordnet as wn
-from nltk.corpus import stopwords
-
 from pattern.en import parse
-from pattern.en import tag
 from pattern.en import parsetree
 from pattern.en import wordnet
 from pattern.en import Sentence
 
-from nl_lib import Logger, Concepts
-logger = Logger.setupLogging(__name__)
+from Logger import *
+logger = setupLogging(__name__)
+logger.setLevel(DEBUG)
+
+from Constants import *
 
 
-def sentenceTokensPattern (sentence, projectsConcepts, wordsConcepts):
+__VERSION__ = u'0.1'
+__author__ = u'morrj140'
+
+
+def sentenceTokensPattern(sentence, projectsConcepts, wordsConcepts):
     stop.append(u"The")
     stop.append(u"This")
     stop.append(u"We")
@@ -54,7 +50,7 @@ def sentenceTokensPattern (sentence, projectsConcepts, wordsConcepts):
             pass
 
 
-def sentenceTokensNLTK (sentence, projectsConcepts, wordsConcepts):
+def sentenceTokensNLTK(sentence, projectsConcepts, wordsConcepts):
     logger.debug(u"Sentence: " + sentence)
         
     for word, pos in nltk.pos_tag(nltk.wordpunct_tokenize(sentence)):
@@ -71,15 +67,15 @@ def sentenceTokensNLTK (sentence, projectsConcepts, wordsConcepts):
 
             # syns = wn.synsets(word)
             # for s in syns:
-                # logger.debug("definition:" + s.definition)
+            #   logger.debug("definition:" + s.definition)
 
-                # logger.debug("examples:")
-                # for b in s.examples:
-                #     logger.debug(b)
+            #   logger.debug("examples:")
+            #   for b in s.examples:
+            #      logger.debug(b)
                 
-                # for l in s.lemmas:
-                #     logger.debug("Synonym: " + l.name)
-                #     wl = wordConcepts.addConcept(l.name, "Synonym")
+            #   for l in s.lemmas:
+            #      logger.debug("Synonym: " + l.name)
+            #      wl = wordConcepts.addConcept(l.name, "Synonym")
 
 
 def sentenceTokensPatternChunks(sentence, projectsConcepts, wordsConcepts):
@@ -93,12 +89,13 @@ def sentenceTokensPatternChunks(sentence, projectsConcepts, wordsConcepts):
             # Add word concept to project
             d = projectsConcepts.addConceptKeyType(u"Descriptions", u"Words")
             w = d.addConceptKeyType(wordChunk, u"Word")
-            p = w.addConceptKeyType(chunk.type, u"POS")
+            w.addConceptKeyType(chunk.type, u"POS")
 
             # Add concept to words
             w = wordsConcepts.addConceptKeyType(wordChunk, u"Word")
             w.addConceptKeyType(chunk.type, u"POS")
             w.addConceptKeyType(projectsConcepts.name, u"Project")
+
 
 def synsetsWordNet(word):
     s = wordnet.synsets(word)[0]

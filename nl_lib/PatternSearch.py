@@ -2,14 +2,8 @@
 #
 # Concept Class for NLP
 #
-__VERSION__ = 0.1
-__author__ = u'morrj140'
-
-import sys
-import os
-
-from pattern.web    import Bing, Google, Wikipedia, plaintext, encode_utf8, URL, extension, download
-from pattern.en     import parsetree
+from pattern.web import Bing, Google, Wikipedia, plaintext, encode_utf8, URL, extension, download
+from pattern.en import parsetree
 from pattern.search import search
 
 from nl_lib import Logger
@@ -19,7 +13,10 @@ from nl_lib.Constants import *
 from nl_lib.Concepts import Concepts
 from nl_lib.TopicCloud import TopicCloud
 from nl_lib.ConceptGraph import PatternGraph, NetworkXGraph, Graph
-    
+
+__VERSION__ = 0.1
+__author__ = u'morrj140'
+
 AGENT = u"Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0"
 
 
@@ -27,11 +24,9 @@ class PatternSearch(object):
     urlConcepts = None
     wordConcepts = None
     searchTerm = None
-    
     homeDir = None
     htmlFile = None
-    
-    g=None
+    g = None
     
     urlConcepts = None
     wordConcepts = None
@@ -39,7 +34,7 @@ class PatternSearch(object):
     def __init__(self, searchTerm, homeDir=None):
         self.searchTerm = searchTerm       
 
-        if homeDir == None:
+        if homeDir is None:
             homeDir = os.curdir
             
         self.homeDir = homeDir + os.sep + u'cms'
@@ -62,19 +57,21 @@ class PatternSearch(object):
         s = plaintext(s)
         s = parsetree(s)
         
-        #self.logSentences(s)
+        # self.logSentences(s)
 
         # Execute a Regular Expression Search
         p = r'(NN)+'
         q = search(p, s)
 
-        #self.logPOS(q)
+        # self.logPOS(q)
 
         # Iterate over all the words in the POS
         logger.debug(u"  q.Length=%d" % len(q))
         logger.debug(u"  q[]=%s" % q)
         
-        self.g, self.urlConcepts, self.wordConcepts = self.addNodes(self.g, q, url, self.urlConcepts, self.wordConcepts)
+        self.g, self.urlConcepts, self.wordConcepts = self.addNodes(self.g, q, url,
+                                                                    self.urlConcepts,
+                                                                    self.wordConcepts)
 
         return self.urlConcepts, self.wordConcepts
 
@@ -88,38 +85,39 @@ class PatternSearch(object):
         logger.info(u"proxyList - %s" % proxyList)
      
         engine = Google(license=None, throttle=0.5, language=None)
-        #engine = Bing(license=None, throttle=0.5, language=None)
+        # engine = Bing(license=None, throttle=0.5, language=None)
     
         for i in range(n):                
             logger.info(u"Search %d" % i)
             results = engine.search(self.searchTerm, start=i+1, count=m, cached=False, proxy=proxyList)
             
             for r in results:
-                logger.debug(u"Result=%s" % Concepts.encode_utf8(r.text))
-                url = Concepts.encode_utf8(r.url)
+                logger.debug(u"Result=%s" % r.text)
+                url = r.url
                 logger.debug(u"URL=%s" % url)
                 
-                #if url[-4:] == ".com":
+                # if url[-4:] == ".com":
                 #    continue
                         
                 s = r.text.lower()
                 s = plaintext(s)
                 s = parsetree(s)
     
-                #self.logSentences(s)
+                # self.logSentences(s)
     
                 # Execute a Regular Expression Search
-                #p = r'(NN)+ (VB)+'
+                # p = r'(NN)+ (VB)+'
                 p = r'(NN)+'
                 q = search(p, s)
     
-                #logPOS(q)
+                # logPOS(q)
     
                 # Iterate over all the words in the POS
                 logger.debug(u"  q.Length=%d" % len(q))
                 logger.debug(u"  q[]=%s" % q)
     
-                self.g, self.urlConcepts, self.wordConcepts = self.addNodes(self.g, q, url, self.urlConcepts, self.wordConcepts)
+                self.g, self.urlConcepts, self.wordConcepts = \
+                    self.addNodes(self.g, q, url, self.urlConcepts, self.wordConcepts)
         
         return self.urlConcepts, self.wordConcepts
     
@@ -176,7 +174,7 @@ class PatternSearch(object):
         
         logger.debug(u"len(e)=%d" % len(e))
     
-        head  = \
+        head = \
             u"<!doctype html>\n" \
             u"<html>\n" \
             u"<head>\n" \
@@ -193,7 +191,7 @@ class PatternSearch(object):
             if x[1] > 1:
                 tableCol1 = u"<td align=\"right\" width=\"30%%\"><a href=\"%s\">[%d](%d)-%s</a></td>\n" % (x[0], x[1] ,x[2], x[0])
                 tableCol2 = u"<td align=\"left\" width=\"70%%\">[%d]=[%s]</td>\n" % (len(x[3]), str(x[3]))
-                tableRow  = u"<tr>\n%s\n%s\n</tr>\n" % (tableCol1, tableCol2)
+                tableRow = u"<tr>\n%s\n%s\n</tr>\n" % (tableCol1, tableCol2)
                 body = u"%s%s" % (body, tableRow)
     
         foot = \
@@ -203,7 +201,8 @@ class PatternSearch(object):
             u"</body>\n" \
             u"</html>"
     
-        html = u"".join(s for s in (str(head), u"Links for ", self.searchTerm, u"<br>\n", str(body), str(foot)))
+        html = u"".join(s for s in (str(head), u"Links for ", self.searchTerm,
+                                    u"<br>\n", str(body), str(foot)))
     
         logger.debug(head + body + foot)
             
@@ -232,7 +231,7 @@ class PatternSearch(object):
             logger.info(word.string + word.tag)
 
     def addNodes(self, g, q, url, urlConcepts, wordConcepts):
-        nodeURL = dict()
+        pp = None
         logger.debug(u"---url %s" % url)
         for w in q:
             logger.debug(u"  w.Length=%d" % len(w))
@@ -240,20 +239,20 @@ class PatternSearch(object):
             i = 1
             for c in w:
                 urls = urlConcepts.addConceptKeyType(url, u"URL")
-                cc = urls.addConceptKeyType(Concepts.encode_utf8(c.string), u"Word")
+                cc = urls.addConceptKeyType(c.string, u"Word")
                 
-                chunk = wordConcepts.addConceptKeyType(Concepts.encode_utf8(c.string), u"Word")
-                chunk.addConceptKeyType(Concepts.encode_utf8(c.chunk), u"Chunk")
+                chunk = wordConcepts.addConceptKeyType(c.string, u"Word")
+                chunk.addConceptKeyType(c.chunk, u"Chunk")
     
-                logger.debug(u"  " + Concepts.encode_utf8(c.string))
+                logger.debug(u"  %s" % c.string)
     
                 if i == 1:
                     i = 2
-                    logger.debug(u"--" + Concepts.encode_utf8(c.string))
+                    logger.debug(u"--%s" % c.string)
                     pp = cc
                     g.addNode(cc)
                 else:
-                    logger.debug(u"--" + Concepts.encode_utf8(c.string))
+                    logger.debug(u"--%s" % c.string)
                     g.addNode(cc)
                     g.addEdge(pp, cc)
                         

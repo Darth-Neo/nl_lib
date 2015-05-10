@@ -2,11 +2,7 @@
 #
 # Concept Class for NLP
 #
-__VERSION__ = 0.1
-__author__ = u'morrj140'
-
 import os
-import sys
 
 from gensim import corpora, models, similarities
 from gensim.models import lsimodel
@@ -16,21 +12,30 @@ logger = setupLogging(__name__)
 logger.setLevel(INFO)
 
 from nl_lib.Concepts import Concepts
+
+__VERSION__ = 0.1
+__author__ = u'morrj140'
+
+
 #
 # TopicModel to analyze topic concepts via Gensim
 #
 class TopicsModel(object):
-    dictFile       = None
-    corpusFile     = None
-    lsiFile        = None
-    topicsFile     = None
-    indexFile      = None
+    dictFile = None
+    corpusFile = None
+    lsiFile = None
+    topicsFile = None
+    indexFile = None
     documentTopics = None
+    corpus = None
+    lsi = None
+    dictionary = None
+    index = None
 
-    dictFilename   = u"Dictionary.dict"
+    dictFilename = u"Dictionary.dict"
     corpusFilename = u"corpus.mm"
-    lsiFilename    = u"model.lsi"
-    indexFilename  = u"topic.index"
+    lsiFilename = u"model.lsi"
+    indexFilename = u"topic.index"
     topicsFileneme = u"topicsDict.p"
 
     texts = None
@@ -49,8 +54,8 @@ class TopicsModel(object):
         self.corpusFile = directory + self.corpusFilename
         self.lsiFile = directory + self.lsiFilename
         self.indexFile = directory + self.indexFilename
-        self.dictFile  = directory + self.dictFilename
-        self.topicsFile  = directory + self.topicsFileneme
+        self.dictFile = directory + self.dictFilename
+        self.topicsFile = directory + self.topicsFileneme
 
     # def __iter__(self):
     #    for line in open('mycorpus.txt'):
@@ -136,13 +141,13 @@ class TopicsModel(object):
         # I can print out the topics for LSI
         self.lsi = lsimodel.LsiModel(corpus_tfidf, id2word=self.dictionary, num_topics=nt)
         logger.debug(u"LSI Complete")
-        corpus_lsi = self.lsi[self.corpus]
+        # corpus_lsi = self.lsi[self.corpus]
 
         logger.debug(u"lsi.print_topics: " + str(self.lsi.print_topics))
 
-        count = 1
-        topics = list()
-        words = list()
+        # count = 1
+        # topics = list()
+        # words = list()
 
         self.saveLSI()
         self.saveCorpus()
@@ -197,7 +202,7 @@ class TopicsModel(object):
         documentSimilarity = list()
 
         for i in range(0, len(simsList)-1):
-            if (simsList[i] > threshold) and (documentsList[j] != documentsList[i])  :
+            if (simsList[i] > threshold) and (documentsList[j] != documentsList[i]):
                 logger.debug(u"Document     : %s" % (documentsList[j]))
                 logger.debug(u"Similar[%s]: %s" % (documentsList[i], simsList[i]))
 

@@ -35,12 +35,12 @@ class Concepts(object):
 
         logger.debug(u"Init Concept - %s:%s" % (self.name, self.typeName))
 
-    def __getitem__(self, id):
+    def __getitem__(self, _id):
         try:
-            return dict.__getitem__(self.cd, id)
+            return dict.__getitem__(self.cd, _id)
 
         except KeyError:
-            raise KeyError, u"no concept with id '%s'" % id
+            raise KeyError, u"no concept with id '%s'" % _id
 
     def incCount(self):
         self.count += 1
@@ -109,14 +109,14 @@ class Concepts(object):
             cl.append(len(wl))  # 4
             nl.append(cl)
 
-        return sorted(nl, key=lambda c: abs(c[1]), reverse=False)
+        return sorted(nl, key=lambda cc: abs(cc[1]), reverse=False)
 
     def _logProperties(self, c, spaces):
 
         prop = c.getProperties()
 
         if prop is not None:
-            for k , v in prop.items():
+            for k, v in prop.items():
                 logger.info(u"%sKey %s => Value %s" % (spaces, k, v))
     
     def logConcepts(self, n=0):
@@ -176,7 +176,7 @@ class Concepts(object):
 
         self.incCount()
 
-        if self.cd.has_key(k):
+        if k in self.cd:
             c = self.cd[k]
             logger.debug(u"Found:     %s\tCount:%s" % (k, c.count))
         else:
@@ -198,7 +198,8 @@ class Concepts(object):
     @staticmethod
     def saveConcepts(concepts, conceptFile):
         try:
-            logger.info(u"Saving Concepts : %s : %s[%d][%s]" % (conceptFile, concepts.name, concepts.count, concepts.typeName))
+            logger.info(u"Saving Concepts : %s : %s[%d][%s]"
+                        % (conceptFile, concepts.name, concepts.count, concepts.typeName))
             cf = open(conceptFile, u"wb")
             pickle.dump(concepts, cf)
             cf.close()
@@ -215,7 +216,8 @@ class Concepts(object):
         try:
             cf = open(conceptFile, u"rb")
             concepts = pickle.load(cf)
-            logger.info(u"Loaded Concepts : %s : %s[%d][%s]" % (conceptFile, concepts.name, concepts.count, concepts.typeName))
+            logger.info(u"Loaded Concepts : %s : %s[%d][%s]"
+                        % (conceptFile, concepts.name, concepts.count, concepts.typeName))
             cf.close()
         except:
             logger.error(str(sys.exc_info()[0]))
@@ -247,15 +249,18 @@ class Concepts(object):
         return rs
 
     @staticmethod
-    def outputConceptsToCSV(concepts, fileExport):
+    def outputConceptsToCSV(concepts, fileExport=None):
         n = 0
+
+        if fileExport is not None:
+            pass
 
         # f = open(fileExport,'w')
         # f.write("Model, Source, Type, Relationship, type, Target, Type\n")
 
-        for c in concepts.getConcepts():
+        for c in concepts.getConcepts().values():
             n += 1
-            fl = Concepts._lineCSV(concepts, None)
+            fl = Concepts._lineCSV(c, None)
             logger.info(u"fl : %s[%s]" % (fl[:-1], n))
 
         # f.close()

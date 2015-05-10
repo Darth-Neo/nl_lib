@@ -2,30 +2,26 @@
 #
 # Concept Class for NLP
 #
-__VERSION__ = 0.1
-__author__ = u'morrj140'
-
-
 import re
-import sys
 import os
 import time
-import math
 import urllib2
 import urlparse
 
-import Logger
-logger = Logger.setupLogging(__name__)
+from Logger import *
+logger = setupLogging(__name__)
+logger.setLevel(INFO)
 
 from cgi import escape
 from traceback import format_exc
-from Queue import Queue, Empty as QueueEmpty
+from Queue import Queue
 from BeautifulSoup import BeautifulSoup
-
 from PatternSearch import PatternSearch
 
-AGENT = u"Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0"
+__VERSION__ = 0.1
+__author__ = u'morrj140'
 
+AGENT = u"Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0"
 homeDir = os.getcwd()
 
 
@@ -64,8 +60,10 @@ class Crawler(object):
                 n += 1
                 logger.info(u"Queue Empty for Depth : %s" % n)
             else:
-                logger.info(u"Parent Queue : %d, Child Queue : %d, Depth : %d" % (qP.qsize(), qC.qsize(), n))
-                lwc, luc = patternSearch.loglengthOfConcepts()
+                logger.info(u"Parent Queue : %d, Child Queue : %d, Depth : %d"
+                            % (qP.qsize(), qC.qsize(), n))
+                # lwc, luc =
+                patternSearch.loglengthOfConcepts()
                 
                 # if lwc > 500:
                 #     break
@@ -106,6 +104,7 @@ class Crawler(object):
             else:
                 logger.debug(u"Link not from - %s" % url)
 
+
 class Fetcher(object):
 
     def __init__(self, url):
@@ -123,7 +122,7 @@ class Fetcher(object):
         url = self.url
         try:            
             request = urllib2.Request(url)
-            handle = None
+
         except IOError:
             return None
         return (request)
@@ -183,7 +182,7 @@ def crawlURL(listURL, single=True, web=False, depth=0):
                 host = urlparse.urlparse(lu)[1]
                 homeDir = u'/home/james.morris/crawler/%s' % host
         else:
-            homeDir=u"/srv/www/htdocs"
+            homeDir = u"/srv/www/htdocs"
         
         if not os.path.exists(homeDir):
             os.makedirs(homeDir)
@@ -213,16 +212,8 @@ if __name__ == u"__main__":
     
     listURL.append(u"http://www.foxnews.com")
     
-    single=True
-    web=False
-    depth=0
+    single = True
+    web = False
+    depth = 0
      
     crawlURL(listURL, single, web, depth)
-    
-    
-    
-        
-    
-    
-    
-    

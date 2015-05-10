@@ -2,10 +2,7 @@
 #
 # Concept Class for NLP
 #
-__VERSION__ = 0.2
-__author__ = u'morrj140'
 
-import os
 from operator import itemgetter
 
 from nl_lib.Logger import *
@@ -14,10 +11,13 @@ logger.setLevel(INFO)
 
 from nl_lib.Constants import *
 from nl_lib.Concepts import Concepts
-from nltk.stem import PorterStemmer, WordNetLemmatizer
+from nltk.stem import WordNetLemmatizer
 
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
+
+__VERSION__ = 0.2
+__author__ = u'morrj140'
 
 #
 # TopicCloud to create a Tag Cloud for Concepts
@@ -51,14 +51,14 @@ class TopicCloud(object):
         else:
             self.font_path = font_path
 
-    def _getDictConcepts(self, concepts, typeName, dictConcepts=None):
+    def _getDictConcepts(self, lconcepts, typeName, dictConcepts=None):
         if dictConcepts is None:
             dictConcepts = dict()
 
-        if len(concepts.getConcepts()) == 0:
+        if len(lconcepts.getConcepts()) == 0:
             return None
 
-        for p in concepts.getConcepts().values():
+        for p in lconcepts.getConcepts().values():
             if p.typeName == unicode(typeName):
                 if p.name in dictConcepts:
                     dictConcepts[p.name] += 1
@@ -102,15 +102,10 @@ class TopicCloud(object):
         e = sorted(dictConcepts.iteritems(), key=itemgetter(1), reverse=True)[:numWords]
         logger.debug(u"e = %s" % e)
 
-        tags = u" ".join([x * int(y) for x, y in e])
+        tags = u" ".join([unicode(x * int(y)) for x, y in e])
 
-        wordcloud = WordCloud(
-              font_path=self.font_path,
-              stopwords=STOPWORDS,
-              background_color=u'white',
-              width=size_x,
-              height=size_y
-             ).generate(tags)
+        wordcloud = WordCloud(font_path=self.font_path, stopwords=STOPWORDS, background_color=u'white',
+                              width=size_x, height=size_y).generate(tags)
 
         plt.imshow(wordcloud)
         plt.axis(u'off')
