@@ -52,6 +52,9 @@ class ConceptGraph(object):
         if filterDict is not None:
             return True
 
+        if concept is None:
+            return
+
         if concept.typeName in filterDict:
             logger.debug(u"Checking Type - %s" % concept.typeName)
             if concept.name in filterDict[concept.typeName]:
@@ -60,7 +63,7 @@ class ConceptGraph(object):
             else:
                 logger.debug(u"Skip Node - %s" % concept.name)
                 return False
-        return True
+            return True
         
     def addConcepts(self, concept, filterDict=None, depth=4, n=0):
         n += 1
@@ -109,7 +112,8 @@ class ConceptGraph(object):
         n += 1
 
         for c in concepts.getConcepts().values():
-            logger.debug(u"%d : %d Node c : %s:%s" % (n, len(c.getConcepts()), c.name, c.typeName))
+            logger.debug(u"%d : %d Node c : %s:%s" %
+                         (n, len(c.getConcepts()), c.name, c.typeName))
 
             self.addConcept(c)
 
@@ -122,9 +126,8 @@ class ConceptGraph(object):
 
         for c in concepts.getConcepts().values():
 
-            logger.debug(u"%d : %d %s c : %s:%s" % (n, len(c.getConcepts()), concepts.name, c.name, c.typeName))
-
-            self.addConcept(c)
+            logger.debug(u"%d : %d %s c : %s:%s" %
+                         (n, len(c.getConcepts()), concepts.name, c.name, c.typeName))
 
             self.addEdge(concepts, c)
 
@@ -223,12 +226,12 @@ class Neo4JGraph(ConceptGraph):
 
         prop = concept.getProperties()
 
-        if len(prop) != 0:
+        if prop is not None:
             ps = u""
             for kk, vv in prop.items():
                 if (vv is not None and len(vv) > 0) and (kk is not None and len(kk) > 0):
-                    k = kk.encode.encode("ascii", errors="replace")
-                    v = vv.encode("ascii", errors="replace")
+                    k = kk.decode("ascii", errors="replace")
+                    v = vv.decode("ascii", errors="replace")
 
                     logger.debug(u"%s : %s" % (k, v))
                     ps = u"%s %s : \"%s\", " % (ps, k, v)
@@ -254,7 +257,7 @@ class Neo4JGraph(ConceptGraph):
             self.batch.append_cypher(bqs)
         else:
             bqs = (u"%s ; " % qs).encode("ascii", errors="replace")
-            query = neo4j.CypherQuery(self.graph, qs)
+            query = neo4j.CypherQuery(self.graph, bqs)
             return query.execute().data
         
     def addEdge(self, parentConcept, childConcept, ttype=None):
@@ -285,7 +288,6 @@ class Neo4JGraph(ConceptGraph):
             bqs = qs.encode('ascii', errors='replace')
             query = neo4j.CypherQuery(self.graph, bqs)
             return query.execute().data
-
 
 
     def Counts(self):

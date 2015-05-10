@@ -122,6 +122,8 @@ def test_Neo4JGraph():
 
     graph = Neo4JGraph(gdb)
 
+    # concepts.logConcepts()
+
     logger.info(u"Adding %s nodes the graph ..." % type(graph))
     graph.addGraphNodes(concepts)
 
@@ -129,11 +131,11 @@ def test_Neo4JGraph():
     graph.addGraphEdges(concepts)
 
     qs = u"MATCH (n) RETURN n.typeName, count(n.typeName) as Count order by Count DESC"
-    lq, qd = graph.query(qs)
+    qd = graph.query(qs)
 
     logger.info(u"Neo4J Counts")
 
-    assert lq is not None
+    assert qd is not None
 
 
 if __name__ == u"__main__":
