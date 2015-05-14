@@ -230,8 +230,13 @@ class Neo4JGraph(ConceptGraph):
             ps = u""
             for kk, vv in prop.items():
                 if (vv is not None and len(vv) > 0) and (kk is not None and len(kk) > 0):
-                    k = kk.decode("ascii", errors="replace")
-                    v = vv.decode("ascii", errors="replace")
+
+                    try:
+                        k = kk.decode("ascii", errors="replace")
+                        v = vv.decode("ascii", errors="replace")
+                    except:
+                        k = "Broken Key"
+                        v = "Broken Value"
 
                     logger.debug(u"%s : %s" % (k, v))
                     ps = u"%s %s : \"%s\", " % (ps, k, v)
@@ -313,42 +318,52 @@ class NetworkXGraph(ConceptGraph):
 
         super(self.__class__, self).__init__()
 
+        if filename is None:
+            self.filename = gmlFile
+        else:
+            self.filename = filename
+
         self.G = nx.Graph()
         self.layout = nx.spring_layout
 
-        if filename is not None:
-            filename = gmlFile
-
-        self.filename = filename
         logger.debug(u"GML saved to : %s" % unicode(self.filename))
 
     def clearGraphDB(self):
         self.G = nx.Graph()
 
     def saveGraph(self, filename=None):
-        if filename is None:
-            filename = os.getcwd() + os.sep + gmlFile
+        if filename is not None:
+            self.filename = filename
 
         dbg = unicode(self.G.nodes(data=True))
 
         logger.debug(u"%s" % dbg)
 
-        nx.write_gml(self.G, filename)
+        nx.write_gml(self.G, self.filename)
 
     def addNode(self, concept):
-        return self.G.add_node(concept.name, count=concept.count, typeName=concept.typeName)
+        name = concept.name.encode('ascii', errors='replace')
+        typeName = concept.typeName.encode('ascii', errors='replace')
+        count = concept.count
+        return self.G.add_node(name, count=count, typeName=typeName)
 
     def addEdge(self, parentConcept, childConcept):
-        return self.G.add_edge(parentConcept.name, childConcept.name)
+        child_name = childConcept.name.encode('ascii', errors='replace')
+        parent_name = parentConcept.name.encode('ascii', errors='replace')
+        return self.G.add_edge(parent_name, child_name)
 
     def saveGraphPajek(self, filename=None):
         if filename is not None:
-            filename = u"concept.net"
-        nx.write_pajek(self.G, filename)
+            self.filename = filename
+
+        nx.write_pajek(self.G, self.filename)
         
     def drawGraph(self, GML_ONLY=True, filename=None):
+
+        logger.debug(u"Drawing Graph")
+
         if filename is not None:
-            self.filename = imageFile
+            self.filename = filename
 
         logger.debug(str(self.G.nodes(data=True)))
 
