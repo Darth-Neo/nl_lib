@@ -163,8 +163,6 @@ def test_clean_concepts(cleandir):
 
     c.logConcepts()
 
-    Concepts.cleanConcepts(c)
-
     assert(c is not None)
 
     c.logConcepts()

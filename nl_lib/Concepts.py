@@ -28,8 +28,8 @@ class Concepts(object):
     properties = None
 
     def __init__(self, name=None, typeName=None):
-        self.name = name.encode("ascii", errors="replace")
-        self.typeName = typeName.encode("ascii", errors="replace")
+        self.name = self._convertConcepts(name)
+        self.typeName = self._convertConcepts(typeName)
         self.cd = dict()
         self.properties = dict()
         self.count = 0
@@ -62,7 +62,7 @@ class Concepts(object):
 
     def dictChildrenType(self, typeName, n=4, conceptFilter=None):
 
-        typeName = typeName.encode("ascii", errors="replace")
+        typeName = self._convertConcepts(typeName)
         logger.debug(u"dictChildrenType %s" % typeName)
         if n < 1:
             return None
@@ -90,7 +90,7 @@ class Concepts(object):
         return z
 
     def sortConcepts(self, typeName):
-        typeName = typeName.encode("ascii", errors="replace")
+        typeName = self._convertConcepts(typeName)
         logger.debug(u"sortConcepts - %s" % typeName)
 
         typeNameDict = self.dictChildrenType(typeName)
@@ -164,10 +164,12 @@ class Concepts(object):
         for p in pc.values():
             p.printConcepts(n+1)
 
+
+
     def addConceptKeyType(self, keyConcept, typeConcept):
 
-        k = keyConcept.encode("ascii", errors='replace')
-        t = typeConcept.encode("ascii", errors='replace')
+        k = self._convertConcepts(keyConcept)
+        t = self._convertConcepts(typeConcept)
 
         self.incCount()
 
@@ -183,17 +185,16 @@ class Concepts(object):
 
     def addConcept(self, concept):
         logger.debug(u"addConcept: %s " % concept.name)
-        Concepts.cleanConcepts(concept)
         self.cd[concept.name] = concept
         
     def addListConcepts(self, listConcepts):
         for p in listConcepts:
-            p.name = p.name.encode("ascii", errors='replace')
-            p.typeName = p.typeName.encode("ascii", errors='replace')
+            p.name = self._convertConcepts(p.name)
+            p.typeName = self._convertConcepts(p.typeName)
             logger.debug(u"%s:%s" % (p.name, p.typeName))
             self.addConcept(p)
 
-    def cleanConcepts(self, n=0):
+    def _cleanConcepts(self, n=0):
 
         logger.info(u"%s : %s", self.name, self.typeName)
         pc = self.getConcepts()
@@ -202,9 +203,20 @@ class Concepts(object):
 
         for p in pc.values():
             logger.debug(u"%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
-            p.name = p.name.strip(u"\"").encode("ascii", errors="replace")
-            p.typeName = p.typeName.strip(u"\"").encode("ascii", errors="replace")
+            p.name = self._convertConcepts(p.name)
+            p.typeName = self._convertConcepts(p.typeName.strip(u"\""))
             p.cleanConcepts(n+1)
+
+    @staticmethod
+    def _convertConcepts(s):
+
+        try:
+            s = s.encode(u"utf-8", errors=u"replace")
+            s = s.decode(u"ascii", errors=u"replace")
+        except:
+            s = s.decode(u"ascii", errors=u"replace")
+            s = s.encode(u"utf-8", errors=u"replace")
+        return s
 
     @staticmethod
     def saveConcepts(concepts, conceptFile):
