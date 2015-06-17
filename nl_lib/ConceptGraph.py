@@ -6,6 +6,9 @@ from nl_lib.Constants import *
 from traceback import format_exc
 
 import networkx as nx
+import json
+from networkx.readwrite import json_graph
+
 import matplotlib.pyplot as plt
 
 import pygraphviz as pgv
@@ -19,6 +22,7 @@ logger.setLevel(INFO)
 
 __VERSION__ = 0.1
 __author__ = u'morrj140'
+
 
 #
 # Hack to get GraphViz to work
@@ -294,7 +298,6 @@ class Neo4JGraph(ConceptGraph):
             query = neo4j.CypherQuery(self.graph, bqs)
             return query.execute().data
 
-
     def Counts(self):
         qs = u"MATCH (n) RETURN n.typeName, count(n.typeName) order by count(n.typeName) DESC"
         lq, qd = self.query(qs)
@@ -323,7 +326,7 @@ class NetworkXGraph(ConceptGraph):
         else:
             self.filename = filename
 
-        self.G = nx.Graph()
+        self.G = nx.DiGraph()
         self.layout = nx.spring_layout
 
         logger.debug(u"GML saved to : %s" % unicode(self.filename))
@@ -378,6 +381,16 @@ class NetworkXGraph(ConceptGraph):
             nx.draw(self.G, pos, node_size=200, cmap=plt.cm.Blues, with_labels=True)
             plt.show()
 
+    def saveJSON(self, concepts):
+
+            fileOutput = u"testData.json"
+
+            d0 = json_graph.tree_data(self.G, root=concepts.name)
+
+            with open(u"testData.json", "w") as f:
+                f.write(json.dumps(d0))
+
+            logger.info(u"Saved : %s" % fileOutput)
 #
 # PatternGraph
 #
