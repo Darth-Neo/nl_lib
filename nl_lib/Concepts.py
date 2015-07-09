@@ -156,12 +156,16 @@ class Concepts(object):
     def printConcepts(self, n=0):
         pc = self.getConcepts()
 
+        if n == 1:
+            print(u"%s" % os.linesep)
+
         spaces = u" " * n
 
         if len(self.name) > 1:
             print(u"%s%s" % (spaces, self.name))
 
         for p in pc.values():
+
             p.printConcepts(n+1)
 
 
