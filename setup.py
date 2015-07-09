@@ -47,8 +47,9 @@ setup(name='nl_lib',
     keywords='nlp setuptools development',
 
     # List run-time dependencies here.  These will be installed by pip when your
-    # project is installed.
-    install_requires=['cython', 'nltk', 'pattern', 'gensim', 'networkx', 'matplotlib', 'pywordcloud',
-                      'py2neo', 'pygraphviz', 'pytest-cov', 'pytest', 'python-docx', 'python-pptx'],)
+    # project is installed. Note: installation order is reversed
+    install_requires=['nltk==3.0.2', 'Pattern==2.6', 'gensim==0.10.3', 'networkx==1.9.1', 'matplotlib==1.4.3',
+                      'pywordcloud==0.2.2', 'py2neo==1.6.4', 'pygraphviz==1.2', 'pytest==2.6.4', 'pytest==2.6.4',
+                      'python-docx==0.8.5', 'python-pptx==0.5.7', 'Cython==0.22'],)
 
 
