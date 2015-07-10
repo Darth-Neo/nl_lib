@@ -117,25 +117,6 @@ class Concepts(object):
 
         return sorted(nl, key=lambda cc: abs(cc[1]), reverse=False)
 
-    def _logProperties(self, c, spaces):
-
-        prop = c.getProperties()
-
-        if prop is not None:
-            for k, v in prop.items():
-                logger.info(u"%sKey %s => Value %s" % (spaces, k, v))
-    
-    def logConcepts(self, n=0):
-        pc = self.getConcepts()
-
-        spaces = u" " * n
-
-        for p in pc.values():
-            logger.info(u"%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
-            self._logProperties(p, spaces)
-
-            p.logConcepts(n+1)
-
     def listCSVConcepts(self, lcsv=None, n=0):
         pc = self.getConcepts()
 
@@ -153,21 +134,47 @@ class Concepts(object):
 
         return lcsv
 
-    def printConcepts(self, n=0):
+    def _fProperties(self, c, spaces, f=None):
+        prop = c.getProperties()
+
+        if prop is not None:
+            for k, v in prop.items():
+                if f is None:
+                    print(u"%sKey %s => Value %s" % (spaces, k, v))
+                else:
+                    f(u"%sKey %s => Value %s" % (spaces, k, v))
+    
+    def logConcepts(self, n=0):
         pc = self.getConcepts()
-
-        if n == 1:
-            print(u"%s" % os.linesep)
-
         spaces = u" " * n
-
-        if len(self.name) > 1:
-            print(u"%s%s" % (spaces, self.name))
+        f = logger.info
 
         for p in pc.values():
+            logger.info(u"%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
+            self._fProperties(p, spaces, f)
+            p.logConcepts(n+1)
 
+    def _printProperties(self, c, spaces):
+        prop = c.getProperties()
+
+        if prop is not None:
+            for k, v in prop.items():
+                print(u"%sKey %s => Value %s" % (spaces, k, v))
+
+    def printConcepts(self, n=0):
+        pc = self.getConcepts()
+        spaces = u" " * n
+
+        if n == 0:
+            print(u"%s" % os.linesep)
+
+        for p in pc.values():
+            if n == 0:
+                print(u"%s" % os.linesep)
+
+            print(u"%s%s" % (spaces, p.name))
+            self._fProperties(p, spaces)
             p.printConcepts(n+1)
-
 
 
     def addConceptKeyType(self, keyConcept, typeConcept):
@@ -215,11 +222,11 @@ class Concepts(object):
     def _convertConcepts(s):
 
         try:
-            s = s.encode(u"utf-8", errors=u"replace")
-            s = s.decode(u"ascii", errors=u"replace")
-        except:
-            s = s.decode(u"ascii", errors=u"replace")
-            s = s.encode(u"utf-8", errors=u"replace")
+            if isinstance(s, str):
+                s = s.decode(u"ascii", errors=u"replace")
+                s = s.encode(u"utf-8", errors=u"replace")
+        except Exception, msg:
+            logger.warn(u"Ops.. %s" % msg)
         return s
 
     @staticmethod
