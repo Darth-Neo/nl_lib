@@ -4,6 +4,8 @@
 #
 # nl_lib Testing
 #
+__author__ = u'morrj140'
+__VERSION__ = u'0.2'
 
 import shutil
 import pytest
@@ -17,8 +19,6 @@ logger.setLevel(INFO)
 from Constants import *
 from Concepts import Concepts
 from ConceptGraph import PatternGraph, GraphVizGraph, NetworkXGraph, Neo4JGraph
-__author__ = u'morrj140'
-__VERSION__ = u'0.2'
 
 #
 # Hack to get GraphViz to work

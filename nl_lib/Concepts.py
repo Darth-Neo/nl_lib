@@ -8,6 +8,7 @@ __author__ = 'morrj140'
 import os
 import sys
 import pickle
+from __future__ import print_function
 
 from Logger import *
 logger = setupLogging(__name__)
@@ -164,6 +165,7 @@ class Concepts(object):
     def printConcepts(self, n=0):
         pc = self.getConcepts()
         spaces = u" " * n
+	f = print
 
         if n == 0:
             print(u"%s" % os.linesep)
@@ -173,7 +175,7 @@ class Concepts(object):
                 print(u"%s" % os.linesep)
 
             print(u"%s%s" % (spaces, p.name))
-            self._fProperties(p, spaces)
+            self._fProperties(p, spaces, f)
             p.printConcepts(n+1)
 
 

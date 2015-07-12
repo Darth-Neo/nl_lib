@@ -6,9 +6,8 @@ from nl_lib.Constants import *
 from traceback import format_exc
 
 import networkx as nx
-import json
 from networkx.readwrite import json_graph
-
+import json
 import matplotlib.pyplot as plt
 
 import pygraphviz as pgv
@@ -67,7 +66,8 @@ class ConceptGraph(object):
             else:
                 logger.debug(u"Skip Node - %s" % concept.name)
                 return False
-            return True
+
+        return True
         
     def addConcepts(self, concept, filterDict=None, depth=4, n=0):
         n += 1
@@ -326,7 +326,7 @@ class NetworkXGraph(ConceptGraph):
         else:
             self.filename = filename
 
-        self.G = nx.DiGraph()
+        self.G = nx.Graph()
         self.layout = nx.spring_layout
 
         logger.debug(u"GML saved to : %s" % unicode(self.filename))
