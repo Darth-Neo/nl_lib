@@ -54,9 +54,10 @@ def test_encoding(cleandir):
     logger.info(u"________________________________________________________________________________")
 
     n += 1
-    q = u'Fl\xfcgel'
+    q = u'Fl\xfcgel' # Flügel
     logger.info(u"%d-%s:%s" % (n, type(q), q))
 
+    # go from q = u'Fl\xfcgel' to Flügel, then Fl��gel
 
 if __name__ == u"__main__":
     test_encoding(cleandir)

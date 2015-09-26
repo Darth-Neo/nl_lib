@@ -207,6 +207,23 @@ class Concepts(object):
             logger.debug(u"%s:%s" % (p.name, p.typeName))
             self.addConcept(p)
 
+    def _convertToASCII(self, col):
+        CM = None
+
+        try:
+            CM = col.encode(u"utf-8", errors=u"ignore")
+            CM = CM.decode(u"ascii", errors=u"ignore")
+
+        except:
+            try:
+                CM = col.decode(u"utf-8", errors=u"ignore")
+                CM = CM.encode(u"ascii", errors=u"ignore")
+
+            except Exception, msg:
+                logger.warn(u"%s" % msg)
+
+        return CM
+
     def _cleanConcepts(self, n=0):
 
         logger.info(u"%s : %s", self.name, self.typeName)

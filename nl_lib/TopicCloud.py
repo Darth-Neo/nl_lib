@@ -23,7 +23,6 @@ __author__ = u'morrj140'
 # TopicCloud to create a Tag Cloud for Concepts
 #
 
-
 class TopicCloud(object):
     topicsConcepts = None
     homeDir = None
