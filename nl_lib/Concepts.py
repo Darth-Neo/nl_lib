@@ -2,13 +2,12 @@
 #
 # Concept Class for NLP
 #
-__VERSION__ = 0.1
-__author__ = 'morrj140'
-
+# __VERSION__ = 0.1
+# __author__ = 'morrj140'
+from __future__ import print_function
 import os
 import sys
 import pickle
-from __future__ import print_function
 
 from Logger import *
 logger = setupLogging(__name__)

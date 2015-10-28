@@ -251,10 +251,10 @@ class TopicsModel(object):
         logger.debug(u"Concept Name:" + concepts.name)
 
         for document in concepts.getConcepts().values():
-            logger.debug(u"Doc: %s" % document.name)
+            logger.debug(u"Doc: %s[%s]" % (document.name, document.typeName))
 
             for sentence in document.getConcepts().values():
-                logger.debug(u"  sent: %s" % sentence.name)
+                logger.debug(u"  sent: %s[%s]" % (sentence.name, sentence.typeName))
 
                 for word in sentence.name.split(delim):
                     if len(word) > 1:

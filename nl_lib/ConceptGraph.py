@@ -26,7 +26,7 @@ __author__ = u'morrj140'
 #
 # Hack to get GraphViz to work
 #
-os.environ[u'PATH'] = u"%s:/opt/local/bin" % os.environ[u'PATH']
+os.environ[u'PATH'] = u"%s:/usr/local/bin" % os.environ[u'PATH']
 
 #
 # Base Class - ConceptGraph to export Concepts into Graph
@@ -344,6 +344,8 @@ class NetworkXGraph(ConceptGraph):
 
         nx.write_gml(self.G, self.filename)
 
+        logger.info(u"Saved - %s" % self.filename)
+
     def addNode(self, concept):
         name = concept.name.encode('ascii', errors='replace')
         typeName = concept.typeName.encode('ascii', errors='replace')
@@ -360,6 +362,8 @@ class NetworkXGraph(ConceptGraph):
             self.filename = filename
 
         nx.write_pajek(self.G, self.filename)
+
+        logger.info(u"Saved - %s" % self.filename)
         
     def drawGraph(self, GML_ONLY=True, filename=None):
 
@@ -376,6 +380,7 @@ class NetworkXGraph(ConceptGraph):
 
         if GML_ONLY:
             nx.write_gml(self.G, self.filename)
+            logger.info(u"Saved - %s" % self.filename)
         else:
             pos = nx.spring_layout(self.G, iterations=500)
             nx.draw(self.G, pos, node_size=200, cmap=plt.cm.Blues, with_labels=True)
@@ -493,3 +498,4 @@ class GraphVizGraph(ConceptGraph):
         logger.debug(self.g.string())  # print dot file to standard output
         self.g.layout(u"dot")  # layout with dot
         self.g.draw(filename)  # write to file
+        logger.info(u"Saved - %s" % filename)
