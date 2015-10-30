@@ -28,8 +28,8 @@ class Concepts(object):
     properties = None
 
     def __init__(self, name=None, typeName=None):
-        self.name = self._convertConcepts(name)
-        self.typeName = self._convertConcepts(typeName)
+        self.name = self.convertString(name)
+        self.typeName = self.convertString(typeName)
         self.cd = dict()
         self.properties = dict()
         self.count = 0
@@ -62,7 +62,7 @@ class Concepts(object):
 
     def dictChildrenType(self, typeName, n=4, conceptFilter=None):
 
-        typeName = self._convertConcepts(typeName)
+        typeName = self.convertString(typeName)
         logger.debug(u"dictChildrenType %s" % typeName)
         if n < 1:
             return None
@@ -90,7 +90,7 @@ class Concepts(object):
         return z
 
     def sortConcepts(self, typeName):
-        typeName = self._convertConcepts(typeName)
+        typeName = self.convertString(typeName)
         logger.debug(u"sortConcepts - %s" % typeName)
 
         typeNameDict = self.dictChildrenType(typeName)
@@ -164,7 +164,7 @@ class Concepts(object):
     def printConcepts(self, n=0):
         pc = self.getConcepts()
         spaces = u" " * n
-	f = print
+        f = print
 
         if n == 0:
             print(u"%s" % os.linesep)
@@ -180,8 +180,8 @@ class Concepts(object):
 
     def addConceptKeyType(self, keyConcept, typeConcept):
 
-        k = self._convertConcepts(keyConcept)
-        t = self._convertConcepts(typeConcept)
+        k = self.convertString(keyConcept)
+        t = self.convertString(typeConcept)
 
         self.incCount()
 
@@ -201,27 +201,11 @@ class Concepts(object):
         
     def addListConcepts(self, listConcepts):
         for p in listConcepts:
-            p.name = self._convertConcepts(p.name)
-            p.typeName = self._convertConcepts(p.typeName)
+            p.name = self.convertString(p.name)
+            p.typeName = self.convertString(p.typeName)
             logger.debug(u"%s:%s" % (p.name, p.typeName))
             self.addConcept(p)
 
-    def _convertToASCII(self, col):
-        CM = None
-
-        try:
-            CM = col.encode(u"utf-8", errors=u"ignore")
-            CM = CM.decode(u"ascii", errors=u"ignore")
-
-        except:
-            try:
-                CM = col.decode(u"utf-8", errors=u"ignore")
-                CM = CM.encode(u"ascii", errors=u"ignore")
-
-            except Exception, msg:
-                logger.warn(u"%s" % msg)
-
-        return CM
 
     def _cleanConcepts(self, n=0):
 
@@ -232,19 +216,38 @@ class Concepts(object):
 
         for p in pc.values():
             logger.debug(u"%s%s[%d]{%s}->Count=%s" % (spaces, p.name, len(p.name), p.typeName, p.count))
-            p.name = self._convertConcepts(p.name)
-            p.typeName = self._convertConcepts(p.typeName.strip(u"\""))
+            p.name = self.convertString(p.name)
+            p.typeName = self.convertString(p.typeName.strip(u"\""))
             p.cleanConcepts(n+1)
 
     @staticmethod
-    def _convertConcepts(s):
+    def convertString(s):
 
         try:
             if isinstance(s, str):
                 s = s.decode(u"ascii", errors=u"replace")
                 s = s.encode(u"utf-8", errors=u"replace")
-        except Exception, msg:
+            elif isinstance(s, unicode):
+                s = s.encode(u"utf-8", errors=u"replace")
+                s = s.decode(u"ascii", errors=u"replace")
+            else:
+                logger.debug(u"Why here?")
+                return None
+
+        except UnicodeDecodeError, msg:
+            s = s.decode(u"utf-8", errors=u"replace")
+            s = s.encode(u"ascii", errors=u"replace")
+
+        except UnicodeEncodeError:
+            s = s.encode(u"utf-8", errors=u"replace")
+            s = s.decode(u"ascii", errors=u"replace")
+
+        except UnicodeError, msg:
             logger.warn(u"Ops.. %s" % msg)
+
+        except Exception, msg:
+            logger.warn(u"%s" % msg)
+
         return s
 
     @staticmethod
@@ -255,8 +258,9 @@ class Concepts(object):
             cf = open(conceptFile, u"wb")
             pickle.dump(concepts, cf)
             cf.close()
-        except:
-            logger.error(str(sys.exc_info()[0]))
+
+        except IOError, msg:
+            logger.error(u"%s - %s " % (msg, str(sys.exc_info()[0])))
 
     @staticmethod        
     def loadConcepts(conceptFile):

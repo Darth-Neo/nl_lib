@@ -291,10 +291,10 @@ class Neo4JGraph(ConceptGraph):
         logger.debug(u"Edge Query .%s." % qs)
 
         if self.batches:
-            bqs = qs.encode('ascii', errors='replace')
+            bqs = qs.encode(u"utf-8", errors=u"replace")
             self.batch.append_cypher(bqs)
         else:
-            bqs = qs.encode('ascii', errors='replace')
+            bqs = qs.encode(u"utf-8", errors=u"replace")
             query = neo4j.CypherQuery(self.graph, bqs)
             return query.execute().data
 
@@ -347,14 +347,18 @@ class NetworkXGraph(ConceptGraph):
         logger.info(u"Saved - %s" % self.filename)
 
     def addNode(self, concept):
-        name = concept.name.encode('ascii', errors='replace')
-        typeName = concept.typeName.encode('ascii', errors='replace')
+        name = u"%s" % concept.name
+        name.encode(u"utf-8", errors=u"ignore")
+
+        typeName = u"%s" % concept.typeName
+        typeName.encode(u"utf-8", errors=u"ignore")
+
         count = concept.count
         return self.G.add_node(name, count=count, typeName=typeName)
 
     def addEdge(self, parentConcept, childConcept):
-        child_name = childConcept.name.encode('ascii', errors='replace')
-        parent_name = parentConcept.name.encode('ascii', errors='replace')
+        child_name = childConcept.name.encode(u"utf-8", errors=u"ignore")
+        parent_name = parentConcept.name.encode(u"utf-8", errors=u"ignore")
         return self.G.add_edge(parent_name, child_name)
 
     def saveGraphPajek(self, filename=None):

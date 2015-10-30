@@ -30,6 +30,7 @@ def cleandir():
 @pytest.mark.Encoding
 def test_encoding(cleandir):
     n = 0
+    s = 'Ivan Krsti\xc4\x87'
 
     logger.info(u"_________________________________________________________________________________")
 

@@ -137,7 +137,7 @@ class PatternSearch(object):
         
         logger.debug(u"Create Tag Cloud")
         tc = TopicCloud(self.wordConcepts, self.homeDir)  
-        tc.createCloudImage()
+        tc.createTagCloud()
         logger.debug(u"Complete createTopicsCloud")
         
     def subGraph(self):
